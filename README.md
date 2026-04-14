@@ -33,7 +33,11 @@ After a **one-time** Cloudflare setup, anyone with the **admin PIN** + **save to
 
 1. In [Cloudflare Dashboard](https://dash.cloudflare.com/) open your **Worker** that serves this site (same name as in `wrangler.toml` → `name`, or rename `name` to match your Worker).
 2. **Settings → Bindings → Add** → **KV Namespace** → variable name **`SITE_DATA`** (recommended) or **`SAVE_DATA`**. Create a namespace first under **Workers & Pages → KV** if the dropdown is empty.
-3. **Settings → Variables and Secrets** → **Add** → **Secret** → name **`SAVE_TOKEN`** or **`save_token`**, value = a **long random password** (the “save token” staff type in admin). Either secret name works with the repo `worker.js`.
+3. **Save token** (pick one place — same string staff type in admin):
+   - **Recommended:** Worker → **Variables and Secrets** → **Secret** → name **`save_token`** or **`SAVE_TOKEN`**.
+   - **Also supported:** KV → open your namespace → **KV Pairs** → add key **`save_token`** or **`SAVE_TOKEN`** with that password (if you already added it there, redeploy after pulling the latest `worker.js`).
+
+   Do **not** put a leading `=` in the value (spreadsheet quirk); use the raw password only.
 4. Deploy this repo so **`worker.js`** is the Worker entry point and static files use the **`ASSETS`** binding (see [Workers Static Assets](https://developers.cloudflare.com/workers/static-assets/)). If you deploy via **Git**, pushing `wrangler.toml` + `worker.js` is usually enough once the project is linked.
 
 ### Day-to-day (staff)
