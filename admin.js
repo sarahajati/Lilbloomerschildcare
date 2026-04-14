@@ -13,7 +13,12 @@
   }
 
   function getPin() {
-    return String((window.LILBLOOMERS_ADMIN_PIN || "").trim());
+    var raw = window.LILBLOOMERS_ADMIN_PIN;
+    var s = raw != null ? String(raw).trim() : "";
+    if (!s) {
+      s = "changeme";
+    }
+    return s;
   }
 
   function loadJsonFile(file) {
@@ -197,8 +202,9 @@
   }
 
   function readStaffFromDom() {
-    $("#staff-editor")
-      .querySelectorAll(".admin-fieldset")
+    var se = $("#staff-editor");
+    if (!se) return;
+    se.querySelectorAll(".admin-fieldset")
       .forEach(function (fs, gi) {
         var members = [];
         fs.querySelectorAll(".admin-row").forEach(function (row) {
@@ -321,9 +327,52 @@
     };
   }
 
+  function tryUnlock() {
+    var gateEl = $("#admin-gate");
+    var appEl = $("#admin-app");
+    var errEl = $("#gate-error");
+    var pinInput = $("#gate-pin");
+    if (!gateEl || !appEl) {
+      if (errEl) errEl.textContent = "Page error: missing layout. Refresh the page.";
+      return;
+    }
+    if (errEl) errEl.textContent = "";
+    var pin = (pinInput && pinInput.value) ? String(pinInput.value).trim() : "";
+    var expected = getPin();
+    if (!pin) {
+      if (errEl) errEl.textContent = "Enter your PIN.";
+      if (pinInput) pinInput.focus();
+      return;
+    }
+    if (pin !== expected) {
+      if (errEl) {
+        errEl.textContent =
+          "Incorrect PIN. It is set in admin-config.js (default is changeme until you change it).";
+      }
+      return;
+    }
+    try {
+      sessionStorage.setItem(SESSION_KEY, "1");
+    } catch (ignore) {
+      if (errEl) {
+        errEl.textContent =
+          "This browser blocked saving your session. Allow storage for this site or try another browser.";
+      }
+      return;
+    }
+    gateEl.hidden = true;
+    appEl.hidden = false;
+    bootApp();
+  }
+
   function gate() {
     var gateEl = $("#admin-gate");
     var appEl = $("#admin-app");
+    if (!gateEl || !appEl) {
+      var err = $("#gate-error");
+      if (err) err.textContent = "Could not start admin (missing #admin-gate or #admin-app).";
+      return;
+    }
     if (sessionStorage.getItem(SESSION_KEY) === "1") {
       gateEl.hidden = true;
       appEl.hidden = false;
@@ -332,20 +381,29 @@
     }
     gateEl.hidden = false;
     appEl.hidden = true;
+
     var form = $("#gate-form");
-    if (!form) return;
-    form.addEventListener("submit", function (e) {
-      e.preventDefault();
-      var pin = ($("#gate-pin") && $("#gate-pin").value) || "";
-      if (pin === getPin() && getPin()) {
-        sessionStorage.setItem(SESSION_KEY, "1");
-        gateEl.hidden = true;
-        appEl.hidden = false;
-        bootApp();
-      } else {
-        $("#gate-error").textContent = "Incorrect PIN. Change it in admin-config.js on the server.";
-      }
-    });
+    if (form) {
+      form.addEventListener("submit", function (e) {
+        e.preventDefault();
+        tryUnlock();
+      });
+    }
+
+    var unlockBtn = $("#gate-unlock");
+    if (unlockBtn) {
+      unlockBtn.addEventListener("click", tryUnlock);
+    }
+
+    var pinInput = $("#gate-pin");
+    if (pinInput) {
+      pinInput.addEventListener("keydown", function (e) {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          tryUnlock();
+        }
+      });
+    }
   }
 
   function bootApp() {
@@ -398,7 +456,15 @@
   }
 
   function init() {
-    gate();
+    try {
+      gate();
+    } catch (e) {
+      var err = $("#gate-error");
+      if (err) {
+        err.textContent =
+          "A script error stopped the admin page. Hard-refresh (Ctrl+Shift+R) or check the browser console.";
+      }
+    }
   }
 
   if (document.readyState === "loading") {

@@ -12,12 +12,17 @@
       <div class="admin-gate-card">
         <h1>Staff &amp; photos</h1>
         <p class="muted">Enter the site PIN to edit team photos and the daycare gallery.</p>
-        <form id="gate-form">
+        <form id="gate-form" novalidate>
           <label class="block">
             PIN
-            <input id="gate-pin" type="password" autocomplete="current-password" required />
+            <input
+              id="gate-pin"
+              type="password"
+              autocomplete="current-password"
+              aria-describedby="gate-error"
+            />
           </label>
-          <button type="submit" class="btn primary">Unlock</button>
+          <button type="button" class="btn primary" id="gate-unlock">Unlock</button>
           <p id="gate-error" class="error" role="alert"></p>
         </form>
         <p class="fine">
@@ -73,7 +78,7 @@
       </section>
     </div>
 
-    <script src="admin-config.js"></script>
-    <script src="admin.js"></script>
+    <script src="admin-config.js?v=2"></script>
+    <script src="admin.js?v=2"></script>
   </body>
 </html>
