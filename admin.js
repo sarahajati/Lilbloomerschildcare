@@ -191,6 +191,23 @@
     URL.revokeObjectURL(a.href);
   }
 
+  var CANVAS_WEBP =
+    (function () {
+      try {
+        var c = document.createElement("canvas");
+        c.width = 2;
+        c.height = 2;
+        var u = c.toDataURL("image/webp", 0.6);
+        return u.indexOf("data:image/webp") === 0;
+      } catch (e) {
+        return false;
+      }
+    })();
+
+  /**
+   * Resize and encode to a data URL under maxBytes. Uses WebP when the browser supports it (smaller
+   * than JPEG at similar quality), lowers quality, then shrinks dimensions until it fits or hits a floor.
+   */
   function resizeImageFile(file, maxW, maxBytes, quality) {
     return new Promise(function (resolve, reject) {
       if (!file.type || file.type.indexOf("image/") !== 0) {
@@ -201,37 +218,66 @@
       var url = URL.createObjectURL(file);
       img.onload = function () {
         URL.revokeObjectURL(url);
-        var w = img.naturalWidth;
-        var h = img.naturalHeight;
-        if (!w || !h) {
+        var ow = img.naturalWidth;
+        var oh = img.naturalHeight;
+        if (!ow || !oh) {
           reject(new Error("Bad image"));
           return;
         }
-        var scale = Math.min(1, maxW / w);
-        var cw = Math.round(w * scale);
-        var ch = Math.round(h * scale);
         var canvas = document.createElement("canvas");
-        canvas.width = cw;
-        canvas.height = ch;
         var ctx = canvas.getContext("2d");
         if (!ctx) {
           reject(new Error("No canvas"));
           return;
         }
-        ctx.drawImage(img, 0, 0, cw, ch);
-        var tryQ = quality;
-        function attempt() {
-          var dataUrl = canvas.toDataURL("image/jpeg", tryQ);
-          if (dataUrl.length > maxBytes && tryQ > 0.45) {
-            tryQ -= 0.1;
-            attempt();
-          } else if (dataUrl.length > maxBytes) {
-            reject(new Error("Image still too large after compression. Use an image URL instead."));
-          } else {
-            resolve(dataUrl);
+        var mime = CANVAS_WEBP ? "image/webp" : "image/jpeg";
+        var minLongestEdge = 200;
+
+        function drawScaledToMaxWidth(limitW) {
+          var scale = Math.min(1, limitW / ow);
+          var cw = Math.max(1, Math.round(ow * scale));
+          var ch = Math.max(1, Math.round(oh * scale));
+          canvas.width = cw;
+          canvas.height = ch;
+          if (mime === "image/jpeg") {
+            ctx.fillStyle = "#ffffff";
+            ctx.fillRect(0, 0, cw, ch);
           }
+          ctx.drawImage(img, 0, 0, cw, ch);
+          return Math.max(cw, ch);
         }
-        attempt();
+
+        function smallestDataUrlUnderCap(startQ) {
+          var q = startQ;
+          var minQ = 0.22;
+          var step = 0.07;
+          while (q >= minQ - 1e-6) {
+            var dataUrl =
+              mime === "image/webp"
+                ? canvas.toDataURL("image/webp", q)
+                : canvas.toDataURL("image/jpeg", q);
+            if (dataUrl.length <= maxBytes) return dataUrl;
+            q -= step;
+          }
+          return null;
+        }
+
+        var limitW = maxW;
+        for (var pass = 0; pass < 22; pass++) {
+          var longest = drawScaledToMaxWidth(limitW);
+          var encoded = smallestDataUrlUnderCap(quality);
+          if (encoded) {
+            resolve(encoded);
+            return;
+          }
+          if (longest <= minLongestEdge) break;
+          limitW = Math.max(minLongestEdge, Math.floor(limitW * 0.8));
+        }
+        reject(
+          new Error(
+            "Still too large for site JSON after heavy compression. Use a hosted image URL, or add files under /media/ in Git and paste that path here."
+          )
+        );
       };
       img.onerror = function () {
         URL.revokeObjectURL(url);
@@ -318,7 +364,7 @@
         if (!file) return;
         var row = input.closest(".admin-row");
         if (!row) return;
-        resizeImageFile(file, 720, 140000, 0.82)
+        resizeImageFile(file, 960, 420000, 0.86)
           .then(function (dataUrl) {
             var urlInput = row.querySelector(".m-photo-url");
             if (urlInput) urlInput.value = dataUrl;
@@ -384,7 +430,7 @@
         var file = input.files && input.files[0];
         if (!file) return;
         var row = input.closest(".gallery-row");
-        resizeImageFile(file, 1200, 220000, 0.82)
+        resizeImageFile(file, 1920, 720000, 0.84)
           .then(function (dataUrl) {
             var srcInput = row.querySelector(".g-src");
             if (srcInput) srcInput.value = dataUrl;

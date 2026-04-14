@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="robots" content="noindex, nofollow" />
     <title>Site content — Lil Bloomers</title>
-    <link rel="stylesheet" href="admin.css?v=7" />
+    <link rel="stylesheet" href="admin.css?v=8" />
   </head>
   <body>
     <div id="admin-gate" class="admin-gate">
@@ -70,9 +70,9 @@
         <h2>Team</h2>
         <p class="muted">
           Use a <strong>Photo URL</strong> (e.g. file in the repo under <code>/media/staff/</code>, or
-          a direct image link). Or choose a small file — it will be compressed and stored as a data
-          URL in JSON (fine for a few headshots; large galleries should use URLs + files in
-          <code>/media/</code>).
+          a direct image link). Or choose a file — it is resized, compressed (WebP when supported),
+          and stored as a data URL in JSON. Very large originals may still need a URL + file in
+          <code>/media/</code>.
         </p>
         <div id="staff-editor"></div>
       </section>
@@ -99,7 +99,7 @@
       </section>
     </div>
 
-    <script src="admin-config.js?v=7"></script>
-    <script src="admin.js?v=7"></script>
+    <script src="admin-config.js?v=8"></script>
+    <script src="admin.js?v=8"></script>
   </body>
 </html>
