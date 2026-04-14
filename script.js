@@ -131,6 +131,35 @@
       });
   }
 
+  /**
+   * Cloud KV may still hold older JSON without `bio`. Fill missing bios from DEFAULT_SITE
+   * by matching member name (case-insensitive) so introductions and click-to-read still work.
+   */
+  function enrichStaffWithDefaultBios(site) {
+    if (!site || !Array.isArray(site.staffGroups)) return;
+    var lookup = {};
+    (DEFAULT_SITE.staffGroups || []).forEach(function (g) {
+      (g.members || []).forEach(function (m) {
+        var k = String(m.name || "")
+          .trim()
+          .toLowerCase();
+        if (k && (m.bio || "").trim()) {
+          lookup[k] = String(m.bio).trim();
+        }
+      });
+    });
+    site.staffGroups.forEach(function (g) {
+      (g.members || []).forEach(function (m) {
+        var k = String(m.name || "")
+          .trim()
+          .toLowerCase();
+        if (k && (!(m.bio || "").trim()) && lookup[k]) {
+          m.bio = lookup[k];
+        }
+      });
+    });
+  }
+
   function renderTeam(container, site) {
     if (!container) return;
     var groups = site.staffGroups || [];
@@ -302,6 +331,8 @@
     var bodyEl = modal.querySelector(".staff-bio-modal__body");
     function closeStaffBio() {
       modal.hidden = true;
+      modal.setAttribute("hidden", "");
+      modal.setAttribute("aria-hidden", "true");
       document.body.style.overflow = "";
     }
     function openStaffBio(name, roleText, bioText) {
@@ -309,6 +340,8 @@
       if (roleEl) roleEl.textContent = roleText || "";
       if (bodyEl) bodyEl.textContent = bioText || "";
       modal.hidden = false;
+      modal.removeAttribute("hidden");
+      modal.setAttribute("aria-hidden", "false");
       document.body.style.overflow = "hidden";
       var x = modal.querySelector(".staff-bio-modal__x");
       if (x) x.focus();
@@ -319,7 +352,8 @@
       el.addEventListener("click", closeStaffBio);
     });
     document.addEventListener("keydown", function staffBioGlobalEsc(e) {
-      if (!modal.hidden && e.key === "Escape") closeStaffBio();
+      if (modal.hasAttribute("hidden")) return;
+      if (e.key === "Escape") closeStaffBio();
     });
   }
 
@@ -503,6 +537,7 @@
   var gallerySection = document.getElementById("gallery");
   var ambientSection = document.getElementById("gallery-ambient");
   function applySiteDataToPage(site) {
+    enrichStaffWithDefaultBios(site);
     if (teamMount) renderTeam(teamMount, site);
     if (gallerySection) renderGallery(gallerySection, site);
     if (ambientSection) renderAmbientSlideshow(ambientSection, site);

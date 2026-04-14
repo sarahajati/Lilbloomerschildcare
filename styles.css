@@ -968,11 +968,11 @@ a:hover {
   pointer-events: none;
 }
 
-/* Staff bio dialog */
+/* Staff bio dialog — above sticky header, hero, and gallery overlays */
 .staff-bio-modal {
   position: fixed;
   inset: 0;
-  z-index: 300;
+  z-index: 8000;
   display: grid;
   place-items: center;
   padding: 1.25rem;
@@ -1081,6 +1081,8 @@ a:hover {
 
 .staff-card--has-bio {
   cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
