@@ -1,12 +1,18 @@
 # Pushes to main run `wrangler deploy` so the live site updates.
-# Repo → Settings → Secrets → Actions → add CLOUDFLARE_API_TOKEN
-# (Create token: Workers Builds / Edit Cloudflare Workers + needed account scope.)
+#
+# GitHub → Settings → Secrets and variables → Actions:
+#   CLOUDFLARE_API_TOKEN — required (see https://developers.cloudflare.com/fundamentals/api/get-started/create-token/)
+#   Use template "Edit Cloudflare Workers" or include: Workers Scripts:Edit, Workers KV Storage:Edit,
+#   Account Settings:Read (exact names may vary slightly in the dashboard).
+#
+# If deploy still fails, open the failed job log and search for ERROR.
 
 name: Deploy Cloudflare Worker
 
 on:
   push:
     branches: [main]
+  workflow_dispatch:
 
 jobs:
   deploy:

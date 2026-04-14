@@ -5,6 +5,8 @@
 
 name = "lilbloomerschildcarecenter"
 main = "worker.js"
+# Required for CI (GitHub Actions) when no global Wrangler config exists
+account_id = "68ed007a9dd655f70b2ca9fe642f5a02"
 compatibility_date = "2025-04-10"
 
 [assets]
