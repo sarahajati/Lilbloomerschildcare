@@ -680,6 +680,48 @@ a:hover {
   margin: 0 0 0.5rem;
 }
 
+.social-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  align-items: center;
+  margin-top: 0.35rem;
+}
+
+.section-contact .social-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.45rem 0.95rem 0.45rem 0.75rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff !important;
+  text-decoration: none !important;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.section-contact .social-link:hover {
+  background: rgba(255, 255, 255, 0.14);
+  border-color: rgba(91, 212, 160, 0.55);
+  color: #e8fff4 !important;
+}
+
+.section-contact .social-icon {
+  flex-shrink: 0;
+  display: block;
+  opacity: 0.95;
+}
+
+.section-contact .fine-print code {
+  font-size: 0.85em;
+  background: rgba(255, 255, 255, 0.08);
+  padding: 0.1em 0.35em;
+  border-radius: 4px;
+}
+
 .fine-print {
   font-size: 0.8rem;
   opacity: 0.75;
