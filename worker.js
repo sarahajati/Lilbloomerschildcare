@@ -111,7 +111,18 @@ export default {
       return new Response("Method not allowed", { status: 405 });
     }
 
-    return env.ASSETS.fetch(request);
+    const assetResp = await env.ASSETS.fetch(request);
+    // Admin UI changes often; avoid stale HTML/JS/CSS at the edge or in browsers.
+    if (/^\/(admin\.(html|js|css)|admin-config\.js)$/.test(path)) {
+      const headers = new Headers(assetResp.headers);
+      headers.set("cache-control", "no-store, max-age=0");
+      headers.set("cdn-cache-control", "no-store");
+      return new Response(assetResp.body, {
+        status: assetResp.status,
+        headers,
+      });
+    }
+    return assetResp;
   },
 };
 
