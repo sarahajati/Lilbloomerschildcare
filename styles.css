@@ -948,14 +948,19 @@ a:hover {
   transform: scale(1.03);
 }
 
+/* Default closed: [hidden] must win — do not set display:grid on .lightbox alone or it overrides [hidden]. */
 .lightbox {
   position: fixed;
   inset: 0;
   z-index: 200;
   background: rgba(20, 28, 24, 0.92);
-  display: grid;
+  display: none;
   place-items: center;
   padding: 2rem 1rem;
+}
+
+.lightbox:not([hidden]) {
+  display: grid;
 }
 
 .lightbox-inner {
