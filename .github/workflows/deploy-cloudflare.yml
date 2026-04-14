@@ -13,6 +13,10 @@
 #
 # After saving the secret, open Actions → latest run → “Re-run all jobs”.
 # Do not put the token in “Variables”; use “Secrets”. No spaces before/after when pasting.
+#
+# Node on Actions: checkout@v6 / setup-node@v6 run on node24. Workflow-level FORCE_* opts the
+# runner in early. If GitHub still shows a Node 20 “annotation”, it may be a known false
+# positive (github.com/actions/runner/issues/4295) or an old run — open the latest job log.
 
 name: Deploy Cloudflare Worker
 
@@ -21,6 +25,9 @@ on:
     branches: [main]
   workflow_dispatch:
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -28,12 +35,9 @@ jobs:
       contents: read
     env:
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-      # GitHub Actions: run JS-based actions on Node 24 (Node 20 runner deprecation)
-      # https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v6.0.2
 
       - name: Check Cloudflare token secret
         shell: bash
@@ -45,7 +49,7 @@ jobs:
           fi
           echo "OK: secret CLOUDFLARE_API_TOKEN is non-empty."
 
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@v6.3.0
         with:
           node-version: "24"
 
