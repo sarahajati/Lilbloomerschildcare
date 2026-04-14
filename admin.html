@@ -39,9 +39,9 @@
         <div>
           <h1>Edit site content</h1>
           <p class="muted">
-            Changes are not saved to the internet automatically. Download <code>site.json</code> and
-            replace <code>data/site.json</code> in GitHub, then push — your Cloudflare deploy will
-            update.
+            Use <strong>Save to website</strong> to publish team &amp; gallery without GitHub (after
+            one-time Cloudflare setup). Or use <strong>Download site.json</strong> if you prefer
+            GitHub.
           </p>
         </div>
         <div class="admin-top-actions">
@@ -70,15 +70,22 @@
       </section>
 
       <section class="admin-panel admin-actions">
-        <button type="button" class="btn primary" id="btn-export">Download site.json</button>
-        <label class="btn ghost file-btn">
-          Import JSON
-          <input id="btn-import" type="file" accept="application/json,.json" hidden />
-        </label>
+        <div class="admin-actions-row">
+          <button type="button" class="btn btn-save-live" id="btn-save-live">Save to website</button>
+          <button type="button" class="btn secondary" id="btn-export">Download site.json</button>
+          <label class="btn secondary file-btn">
+            Import JSON
+            <input id="btn-import" type="file" accept="application/json,.json" hidden />
+          </label>
+        </div>
+        <p class="admin-actions-help">
+          <button type="button" class="link-btn" id="btn-clear-save-token">Forget save token</button>
+          on this browser (you will be prompted again next time).
+        </p>
       </section>
     </div>
 
-    <script src="admin-config.js?v=2"></script>
-    <script src="admin.js?v=2"></script>
+    <script src="admin-config.js?v=3"></script>
+    <script src="admin.js?v=3"></script>
   </body>
 </html>

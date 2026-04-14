@@ -1,0 +1,14 @@
+# Cloudflare Workers + static assets (same folder as your HTML/CSS/JS).
+# After connecting this repo, add in the dashboard (or via wrangler):
+#   - KV namespace binding: variable name SITE_DATA
+#   - Secret: SAVE_TOKEN (long random string; share with staff who update photos)
+#
+# Docs: https://developers.cloudflare.com/workers/static-assets/
+
+name = "lilbloomerschildcarecenter"
+main = "worker.js"
+compatibility_date = "2025-04-10"
+
+[assets]
+directory = "."
+binding = "ASSETS"

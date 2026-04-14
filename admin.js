@@ -1,5 +1,6 @@
 (function () {
   var SESSION_KEY = "lilbloomers_admin_ok";
+  var SESSION_SAVE_TOKEN = "lilbloomers_save_token";
   var booted = false;
 
   function $(sel, root) {
@@ -43,12 +44,47 @@
   }
 
   function fetchSite() {
-    return fetch("data/site.json", { cache: "no-store" })
+    return fetch("/api/site", { cache: "no-store" })
       .then(function (r) {
-        if (!r.ok) throw new Error("fetch");
+        if (!r.ok) throw new Error("api");
         return r.json();
       })
-      .then(normalizeData);
+      .then(normalizeData)
+      .catch(function () {
+        return fetch("data/site.json", { cache: "no-store" })
+          .then(function (r2) {
+            if (!r2.ok) throw new Error("file");
+            return r2.json();
+          })
+          .then(normalizeData);
+      });
+  }
+
+  function getSaveToken() {
+    var fromSession = sessionStorage.getItem(SESSION_SAVE_TOKEN);
+    if (fromSession && String(fromSession).trim()) return String(fromSession).trim();
+    var fromWindow = window.LILBLOOMERS_SAVE_TOKEN;
+    if (fromWindow != null && String(fromWindow).trim()) return String(fromWindow).trim();
+    return "";
+  }
+
+  function ensureSaveToken() {
+    var t = getSaveToken();
+    if (t) return Promise.resolve(t);
+    var msg =
+      "Enter the site SAVE TOKEN (same value the owner set as the SAVE_TOKEN secret in Cloudflare).\n\n" +
+      "This lets you publish changes without GitHub. Cancel to use “Download site.json” only.";
+    var entered = window.prompt(msg, "");
+    if (!entered || !String(entered).trim()) {
+      return Promise.reject(new Error("cancel"));
+    }
+    entered = String(entered).trim();
+    try {
+      sessionStorage.setItem(SESSION_SAVE_TOKEN, entered);
+    } catch (e) {
+      return Promise.reject(new Error("storage"));
+    }
+    return Promise.resolve(entered);
   }
 
   function downloadJson(filename, obj) {
@@ -416,18 +452,89 @@
         renderGalleryEditor();
       })
       .catch(function () {
-        $("#admin-toast").textContent = "Could not load data/site.json. Using empty template.";
+        $("#admin-toast").textContent =
+          "Could not load site data (/api/site or data/site.json). Using an empty template.";
         state = { staffGroups: [], gallery: [] };
         renderStaffEditor();
         renderGalleryEditor();
       });
+
+    var btnSaveLive = $("#btn-save-live");
+    if (btnSaveLive) {
+      btnSaveLive.addEventListener("click", function () {
+        var toast = $("#admin-toast");
+        ensureSaveToken()
+          .then(function (token) {
+            var obj = buildExportObject();
+            return fetch("/api/site", {
+              method: "POST",
+              headers: {
+                Authorization: "Bearer " + token,
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(obj),
+            }).then(function (r) {
+              return r.text().then(function (txt) {
+                var body = {};
+                try {
+                  body = txt ? JSON.parse(txt) : {};
+                } catch (ignore) {}
+                return { r: r, body: body };
+              });
+            });
+          })
+          .then(function (out) {
+            if (out.r.status === 401) {
+              try {
+                sessionStorage.removeItem(SESSION_SAVE_TOKEN);
+              } catch (ignore) {}
+              throw new Error("Wrong save token. Try again or ask the owner for the current token.");
+            }
+            if (out.r.status === 503) {
+              throw new Error(
+                (out.body && out.body.error) ||
+                  "Cloud save is not set up yet (KV + SAVE_TOKEN in Cloudflare). See README."
+              );
+            }
+            if (!out.r.ok) {
+              throw new Error((out.body && out.body.error) || "Save failed (" + out.r.status + ").");
+            }
+            if (toast) {
+              toast.textContent =
+                "Saved. The public site will load this data from the cloud on the next visit (refresh the homepage).";
+            }
+          })
+          .catch(function (e) {
+            if (e && e.message === "cancel") {
+              if (toast) toast.textContent = "Save cancelled. You can still use Download site.json.";
+              return;
+            }
+            if (e && e.message === "storage") {
+              if (toast) toast.textContent = "Could not remember the token in this browser.";
+              return;
+            }
+            if (toast) toast.textContent = e.message || "Could not save.";
+          });
+      });
+    }
+
+    var btnClearToken = $("#btn-clear-save-token");
+    if (btnClearToken) {
+      btnClearToken.addEventListener("click", function () {
+        try {
+          sessionStorage.removeItem(SESSION_SAVE_TOKEN);
+        } catch (ignore) {}
+        var toast = $("#admin-toast");
+        if (toast) toast.textContent = "Save token cleared for this browser. Next save will ask again.";
+      });
+    }
 
     var btnExport = $("#btn-export");
     if (btnExport) btnExport.addEventListener("click", function () {
       var obj = buildExportObject();
       downloadJson("site.json", obj);
       $("#admin-toast").textContent =
-        "Downloaded site.json — replace the file in your repo at data/site.json, commit, and push to update the live site.";
+        "Downloaded site.json — optional: replace data/site.json in GitHub, or use Save to website if cloud save is enabled.";
     });
 
     var btnImport = $("#btn-import");

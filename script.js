@@ -46,24 +46,34 @@
     return div.innerHTML;
   }
 
+  function normalizeLoaded(data) {
+    if (!data || !Array.isArray(data.staffGroups)) throw new Error("shape");
+    return {
+      staffGroups: data.staffGroups,
+      gallery: Array.isArray(data.gallery) ? data.gallery : [],
+    };
+  }
+
   function loadSiteData() {
-    return fetch("data/site.json", { cache: "no-store" })
+    return fetch("/api/site", { cache: "no-store" })
       .then(function (r) {
-        if (!r.ok) throw new Error("bad status");
+        if (!r.ok) throw new Error("api");
         return r.json();
       })
-      .then(function (data) {
-        if (!data || !Array.isArray(data.staffGroups)) throw new Error("shape");
-        return {
-          staffGroups: data.staffGroups,
-          gallery: Array.isArray(data.gallery) ? data.gallery : [],
-        };
-      })
+      .then(normalizeLoaded)
       .catch(function () {
-        return {
-          staffGroups: JSON.parse(JSON.stringify(DEFAULT_SITE.staffGroups)),
-          gallery: [],
-        };
+        return fetch("data/site.json", { cache: "no-store" })
+          .then(function (r2) {
+            if (!r2.ok) throw new Error("file");
+            return r2.json();
+          })
+          .then(normalizeLoaded)
+          .catch(function () {
+            return {
+              staffGroups: JSON.parse(JSON.stringify(DEFAULT_SITE.staffGroups)),
+              gallery: [],
+            };
+          });
       });
   }
 

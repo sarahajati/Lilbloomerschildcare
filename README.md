@@ -10,37 +10,44 @@ Static site for **Lil Bloomers Childcare Centre** (North Vancouver, BC): program
 
 | Path | Purpose |
 | ---- | ------- |
+| `worker.js` | Cloudflare Worker: serves files + **`/api/site`** (read/write site JSON in KV) |
+| `wrangler.toml` | Worker + static assets config (`name` should match your Worker in Cloudflare) |
 | `index.html` | Main page |
 | `styles.css` | Layout and styling |
-| `script.js` | Navigation, team & gallery from JSON, contact form submit |
-| `config.js` | **Web3Forms** access key (see below) |
-| `data/site.json` | Staff groups, roles, photo URLs, and daycare gallery images |
-| `admin.html` + `admin.js` + `admin.css` | PIN-protected editor for staff & gallery |
-| `admin-config.js` | Admin PIN (change the default) |
-| `media/` | Optional: commit photos here and reference `/media/...` in `site.json` |
+| `script.js` | Navigation, team & gallery (loads **`/api/site`** then falls back to `data/site.json`) |
+| `config.js` | **Web3Forms** access key |
+| `data/site.json` | Default / fallback site data (Git) |
+| `admin.html` + `admin.js` + `admin.css` | PIN-protected editor |
+| `admin-config.js` | Admin PIN; optional `LILBLOOMERS_SAVE_TOKEN` |
+| `media/` | Optional image files referenced by URL |
 
 ## Contact form → your email
 
-Messages are sent through **[Web3Forms](https://web3forms.com/)** (free tier: create an account, add your email, copy the **Access Key**).
+Use **[Web3Forms](https://web3forms.com/)**: put your **Access Key** in `config.js` as `web3formsAccessKey`, and restrict by domain in the Web3Forms dashboard.
 
-1. Open `config.js`.
-2. Set `web3formsAccessKey` to your key (keep the quotes).
-3. In the Web3Forms dashboard you can restrict submissions by **domain** (recommended): `lilbloomerschildcarecenter.ca`.
+## Staff & gallery — **Save to website** (no GitHub for staff)
 
-The form submits in the browser; you do not need your own mail server.
+After a **one-time** Cloudflare setup, anyone with the **admin PIN** + **save token** can publish changes from **Save to website** without touching GitHub.
 
-## Staff photos & daycare gallery
+### One-time setup (owner)
 
-The homepage loads **`data/site.json`**. To update photos or the gallery:
+1. In [Cloudflare Dashboard](https://dash.cloudflare.com/) open your **Worker** that serves this site (same name as in `wrangler.toml` → `name`, or rename `name` to match your Worker).
+2. **Settings → Bindings → Add** → **KV Namespace** → variable name **`SITE_DATA`** (must match `worker.js`). Create a new namespace if needed.
+3. **Settings → Variables and Secrets** → **Add** → **Secret** → name **`SAVE_TOKEN`**, value = a **long random password** (this is the “save token” staff will type once per browser).
+4. Deploy this repo so **`worker.js`** is the Worker entry point and static files use the **`ASSETS`** binding (see [Workers Static Assets](https://developers.cloudflare.com/workers/static-assets/)). If you deploy via **Git**, pushing `wrangler.toml` + `worker.js` is usually enough once the project is linked.
 
-1. Open **`/admin.html`** on your live site (footer link: **Update photos**), or open `admin.html` locally with a static server.
-2. Sign in with the PIN from **`admin-config.js`** (change `changeme` to something only staff know).
-3. Edit team rows and gallery entries. You can use:
-   - **Image URL** — e.g. commit files under `media/gallery/` or `media/staff/` in GitHub and use paths like `/media/staff/ali.jpg`, or any `https://…` direct image link.
-   - **Small file upload** in the admin UI — images are compressed and stored as **data URLs** inside JSON (fine for a few staff shots; for many large photos, prefer files in `media/` + URL).
-4. Click **Download site.json**, then in GitHub replace **`data/site.json`** with the downloaded file, **commit**, and **push**. Cloudflare will redeploy from Git.
+### Day-to-day (staff)
 
-**Stronger access control:** add [Cloudflare Access](https://developers.cloudflare.com/cloudflare-one/policies/access/) for `/admin.html` so only invited people can open the page (the PIN alone is only light protection).
+1. Open **`https://your-domain/admin.html`**, enter the **PIN** from `admin-config.js`.
+2. Edit team / gallery (URLs or small image uploads as before).
+3. Click **Save to website**. The first time, the browser asks for the **save token** (same value as the **`SAVE_TOKEN`** secret). It is then remembered for that browser until **Forget save token**.
+4. Refresh the public homepage — it loads data from **`GET /api/site`** (KV), with fallback to `data/site.json` if KV is empty.
+
+Optional: set `LILBLOOMERS_SAVE_TOKEN` in `admin-config.js` to the same string as `SAVE_TOKEN` so trusted browsers skip the prompt (**avoid** in a public Git repo).
+
+### Without cloud setup
+
+**Save to website** returns a clear error until KV + `SAVE_TOKEN` exist. You can still use **Download site.json** and replace `data/site.json` in GitHub.
 
 ## Run locally
 
@@ -49,15 +56,13 @@ cd "path\to\Daycare"
 npx --yes serve .
 ```
 
-Then open the printed URL (include **`/admin.html`** when testing the editor). `config.js` and `data/site.json` must load from the same origin (opening `index.html` as a `file://` URL may block `fetch` for JSON in some browsers—use `serve`).
+Use a local server so `fetch("/api/site")` and JSON paths work. For full Worker behaviour, use `npx wrangler dev`.
 
 ## Deploy (Cloudflare)
 
-If you use **Git-connected Workers/Pages** with static assets:
-
-- Build: none  
-- Output / root: repository root (`index.html` at root)  
-- **Custom domain:** attach your domain under the project’s **Custom domains** (do not rely on a random Worker **route** for the same hostname unless you know you need it).
+- Connect this Git repo to the Worker / static asset project.  
+- **`wrangler.toml`** `name` must match the Worker name in Cloudflare (or change it to match).  
+- Add **custom domain** on the project; avoid extra Worker **routes** on the same hostname unless intended.
 
 ## License
 
