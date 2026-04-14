@@ -22,19 +22,34 @@
     return s;
   }
 
-  function loadJsonFile(file) {
-    return new Promise(function (resolve, reject) {
-      var reader = new FileReader();
-      reader.onload = function () {
-        try {
-          resolve(JSON.parse(reader.result));
-        } catch (e) {
-          reject(e);
-        }
-      };
-      reader.onerror = reject;
-      reader.readAsText(file, "UTF-8");
-    });
+  function clampNum(n, lo, hi) {
+    return Math.min(hi, Math.max(lo, n));
+  }
+
+  /**
+   * Tunable via window.LILBLOOMERS_ADMIN_PHOTO_LIMITS in admin-config.js:
+   *   staffMaxW, staffMaxBytes, galleryMaxW, galleryMaxBytes, quality (0.3–0.98)
+   */
+  function getPhotoLimits() {
+    var raw = window.LILBLOOMERS_ADMIN_PHOTO_LIMITS;
+    var cfg = raw && typeof raw === "object" ? raw : {};
+    function intOr(key, def, lo, hi) {
+      var v = parseInt(cfg[key], 10);
+      if (isNaN(v) || v < 1) v = def;
+      return Math.round(clampNum(v, lo, hi));
+    }
+    function floatOr(key, def) {
+      var v = Number(cfg[key]);
+      if (isNaN(v)) v = def;
+      return clampNum(v, 0.3, 0.98);
+    }
+    return {
+      staffMaxW: intOr("staffMaxW", 1200, 400, 4096),
+      staffMaxBytes: intOr("staffMaxBytes", 900000, 80000, 3500000),
+      galleryMaxW: intOr("galleryMaxW", 2560, 600, 4096),
+      galleryMaxBytes: intOr("galleryMaxBytes", 2000000, 150000, 3500000),
+      quality: floatOr("quality", 0.92),
+    };
   }
 
   function normalizeData(raw) {
@@ -168,7 +183,7 @@
     if (t) return Promise.resolve(t);
     var msg =
       "Enter the site SAVE TOKEN (same value the owner set as the SAVE_TOKEN secret in Cloudflare).\n\n" +
-      "This lets you publish changes without GitHub. Cancel to use “Download site.json” only.";
+      "This lets you publish changes to the website. Cancel to skip.";
     var entered = window.prompt(msg, "");
     if (!entered || !String(entered).trim()) {
       return Promise.reject(new Error("cancel"));
@@ -180,15 +195,6 @@
       return Promise.reject(new Error("storage"));
     }
     return Promise.resolve(entered);
-  }
-
-  function downloadJson(filename, obj) {
-    var blob = new Blob([JSON.stringify(obj, null, 2)], { type: "application/json" });
-    var a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = filename;
-    a.click();
-    URL.revokeObjectURL(a.href);
   }
 
   var CANVAS_WEBP =
@@ -231,7 +237,7 @@
           return;
         }
         var mime = CANVAS_WEBP ? "image/webp" : "image/jpeg";
-        var minLongestEdge = 200;
+        var minLongestEdge = 240;
 
         function drawScaledToMaxWidth(limitW) {
           var scale = Math.min(1, limitW / ow);
@@ -249,8 +255,8 @@
 
         function smallestDataUrlUnderCap(startQ) {
           var q = startQ;
-          var minQ = 0.22;
-          var step = 0.07;
+          var minQ = 0.18;
+          var step = 0.06;
           while (q >= minQ - 1e-6) {
             var dataUrl =
               mime === "image/webp"
@@ -312,7 +318,7 @@
               '<label>Photo URL <input type="text" class="m-photo-url" placeholder="https://… or /media/staff/name.jpg" value="' +
               escapeHtml(m.photo) +
               '" /></label>' +
-              '<label class="admin-file-label">Or small photo file (JPEG/PNG, optional)' +
+              '<label class="admin-file-label">Or upload photo (JPEG/PNG/WebP, optional)' +
               '<input type="file" class="m-photo-file" accept="image/*" /></label>' +
               '<button type="button" class="btn btn-small btn-danger-outline remove-member">Remove person</button>' +
               "</div>"
@@ -364,7 +370,8 @@
         if (!file) return;
         var row = input.closest(".admin-row");
         if (!row) return;
-        resizeImageFile(file, 960, 420000, 0.86)
+        var lim = getPhotoLimits();
+        resizeImageFile(file, lim.staffMaxW, lim.staffMaxBytes, lim.quality)
           .then(function (dataUrl) {
             var urlInput = row.querySelector(".m-photo-url");
             if (urlInput) urlInput.value = dataUrl;
@@ -430,7 +437,8 @@
         var file = input.files && input.files[0];
         if (!file) return;
         var row = input.closest(".gallery-row");
-        resizeImageFile(file, 1920, 720000, 0.84)
+        var lim = getPhotoLimits();
+        resizeImageFile(file, lim.galleryMaxW, lim.galleryMaxBytes, lim.quality)
           .then(function (dataUrl) {
             var srcInput = row.querySelector(".g-src");
             if (srcInput) srcInput.value = dataUrl;
@@ -741,7 +749,7 @@
               return;
             }
             if (e && e.message === "cancel") {
-              if (toast) toast.textContent = "Save cancelled. You can still use Download site.json.";
+              if (toast) toast.textContent = "Save cancelled.";
               return;
             }
             if (e && e.message === "storage") {
@@ -772,32 +780,6 @@
         if (toast) toast.textContent = "Save token cleared for this browser. Next save will ask again.";
       });
     }
-
-    var btnExport = $("#btn-export");
-    if (btnExport) btnExport.addEventListener("click", function () {
-      var obj = buildExportObject();
-      downloadJson("site.json", obj);
-      $("#admin-toast").textContent =
-        "Downloaded site.json — optional: replace data/site.json in GitHub, or use Save to website if cloud save is enabled.";
-    });
-
-    var btnImport = $("#btn-import");
-    if (btnImport) btnImport.addEventListener("change", function (e) {
-      var f = e.target.files && e.target.files[0];
-      if (!f) return;
-      loadJsonFile(f)
-        .then(normalizeData)
-        .then(function (data) {
-          state = data;
-          renderStaffEditor();
-          renderGalleryEditor();
-          $("#admin-toast").textContent = "Imported JSON into the editor.";
-        })
-        .catch(function () {
-          $("#admin-toast").textContent = "Invalid JSON file.";
-        });
-      e.target.value = "";
-    });
 
     var btnLogout = $("#btn-logout");
     if (btnLogout) btnLogout.addEventListener("click", function () {

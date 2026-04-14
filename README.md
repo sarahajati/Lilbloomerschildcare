@@ -18,7 +18,7 @@ Static site for **Lil Bloomers Childcare Centre** (North Vancouver, BC): program
 | `config.js` | **Web3Forms** access key |
 | `data/site.json` | Default / fallback site data (Git) |
 | `admin.html` + `admin.js` + `admin.css` | PIN-protected editor |
-| `admin-config.js` | Admin PIN; optional `LILBLOOMERS_SAVE_TOKEN` |
+| `admin-config.js` | Admin PIN; optional save token; optional `LILBLOOMERS_ADMIN_PHOTO_LIMITS` |
 | `media/` | Optional image files referenced by URL |
 
 ## Contact form → your email
@@ -49,9 +49,11 @@ After a **one-time** Cloudflare setup, anyone with the **admin PIN** + **save to
 
 Optional: set `LILBLOOMERS_SAVE_TOKEN` in `admin-config.js` to the same string as your Cloudflare save secret so trusted browsers skip the prompt (**avoid** in a public Git repo).
 
+Optional: set **`LILBLOOMERS_ADMIN_PHOTO_LIMITS`** in `admin-config.js` (see the commented example there) to allow larger or higher-quality embedded photos; defaults are tuned for a balance of quality and KV JSON size.
+
 ### Without cloud setup
 
-**Save to website** returns a clear error until a **KV binding** (`KV`, `SITE_DATA`, or `SAVE_DATA`) and a **save secret** (`SAVE_TOKEN` or `save_token`) exist. You can still use **Download site.json** and replace `data/site.json` in GitHub.
+**Save to website** returns a clear error until a **KV binding** (`KV`, `SITE_DATA`, or `SAVE_DATA`) and a **save secret** (`SAVE_TOKEN` or `save_token`) exist. Developers can still edit **`data/site.json`** in Git for defaults when KV is empty.
 
 ## Run locally
 
