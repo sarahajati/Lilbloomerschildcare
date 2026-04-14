@@ -333,6 +333,7 @@
     gateEl.hidden = false;
     appEl.hidden = true;
     var form = $("#gate-form");
+    if (!form) return;
     form.addEventListener("submit", function (e) {
       e.preventDefault();
       var pin = ($("#gate-pin") && $("#gate-pin").value) || "";
