@@ -68,6 +68,21 @@ Use a local server so `fetch("/api/site")` and JSON paths work. For full Worker 
 - **`wrangler.toml`** `name` must match the Worker name in Cloudflare (or change it to match).  
 - Add **custom domain** on the project; avoid extra Worker **routes** on the same hostname unless intended.
 
+### Why KV / bindings “disappear” after a while
+
+Your build uses **`npx wrangler deploy`**. Each deploy applies the Worker config from **`wrangler.toml` + the dashboard only for what Wrangler merges**.
+
+If **KV** (or other bindings) were added **only** under **Worker → Settings → Bindings** in the UI, but **`wrangler.toml` does not declare that same binding**, the next Git deploy can **drop** those UI-only bindings. It is not random Cloudflare decay—it usually happens on the **next push / redeploy**.
+
+**Fix (pick one):**
+
+1. **Recommended:** In `wrangler.toml`, add a **`[[kv_namespaces]]`** block with `binding = "SITE_DATA"` and your namespace **`id`** (UUID from **KV** in the dashboard). See the commented template at the bottom of `wrangler.toml`. Uncomment, paste your real id, commit, push.  
+2. **Alternative:** Stop using Git auto-deploy for this Worker and deploy only from the dashboard (not ideal if you want Git as source of truth).
+
+**Secrets** (`save_token`, etc.) added under **Variables and Secrets** can be affected the same way if your deploy pipeline replaces config; keeping secrets in the dashboard is common, but **KV namespace bindings** should live in **`wrangler.toml`** so Git deploys stay consistent.
+
+Also double-check you are not looking at a **preview** deployment vs **production**, or a **different Worker** name, when comparing bindings.
+
 ## License
 
 Content reflects publicly stated centre information. Use and branding are subject to the centre’s policies.

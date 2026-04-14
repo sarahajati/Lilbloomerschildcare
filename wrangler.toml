@@ -12,3 +12,13 @@ compatibility_date = "2025-04-10"
 [assets]
 directory = "."
 binding = "ASSETS"
+
+# IMPORTANT: Git runs `wrangler deploy`. Bindings you add only in the Cloudflare UI
+# are often REMOVED on the next deploy unless they also exist here.
+#
+# 1. Workers & Pages → KV → your namespace → copy the Namespace ID (UUID).
+# 2. Uncomment the block below and paste the id. Push to Git → bindings stay.
+#
+# [[kv_namespaces]]
+# binding = "SITE_DATA"
+# id = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
