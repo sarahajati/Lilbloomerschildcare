@@ -391,20 +391,49 @@ a:hover {
   gap: 0.65rem;
 }
 
-.hero-card-title {
+/* Hero right column: rotating album only (title lives in .growing-together-band below) */
+.hero-card-inner--album-only {
+  padding: clamp(0.65rem, 1.5vw, 1rem);
+  gap: 0;
+  flex: 1;
+  min-height: clamp(200px, 28vw, 280px);
+}
+
+.hero-card-inner--album-only .gallery-ambient {
+  margin-top: 0;
+  flex: 1 1 auto;
+  min-height: clamp(176px, 26vw, 268px);
+}
+
+/* Full-width strip between hero and About */
+.growing-together-band {
+  background: linear-gradient(180deg, #e8f4ec 0%, #dceee4 45%, #d4e8dd 100%);
+  border-top: 1px solid rgba(45, 90, 68, 0.12);
+  border-bottom: 1px solid rgba(45, 90, 68, 0.1);
+}
+
+.growing-together-band__inner {
+  text-align: center;
+  padding: clamp(1.5rem, 3.5vw, 2.35rem) 1rem;
+  max-width: 48rem;
+  margin: 0 auto;
+}
+
+.growing-together-band__title {
   font-family: var(--font-display);
-  font-size: clamp(1.35rem, 2.4vw, 1.65rem);
+  font-size: clamp(1.5rem, 3.2vw, 2.1rem);
   font-weight: 700;
-  margin: 0;
-  line-height: 1.2;
+  margin: 0 0 0.5rem;
+  line-height: 1.15;
   color: var(--color-accent-dark);
 }
 
-.hero-card-text {
+.growing-together-band__lead {
   margin: 0;
+  font-size: clamp(1rem, 2vw, 1.15rem);
+  line-height: 1.5;
   color: var(--color-muted);
-  font-size: 0.98rem;
-  line-height: 1.45;
+  font-weight: 500;
 }
 
 .section {
@@ -875,11 +904,11 @@ a:hover {
   color: #ffc9c9;
 }
 
-/* Rotating photo album — inside hero card (“Growing together”) */
+/* Rotating photo album — inside hero card (album-only column) */
 .gallery-ambient {
   position: relative;
   width: 100%;
-  margin: 0.35rem 0 0;
+  margin: 0;
   flex: 1 1 auto;
   min-height: clamp(168px, 26vw, 260px);
   overflow: hidden;
