@@ -4,20 +4,60 @@
       "id": "leadership",
       "title": "Leadership & administration",
       "members": [
-        { "name": "Ali", "role": "Director & Co-owner", "photo": "" },
-        { "name": "Sue", "role": "Manager (IT, ECE)", "photo": "" }
+        {
+          "name": "Ali",
+          "role": "Director & Co-owner",
+          "photo": "",
+          "bio": "As a leader and co-owner, Ali is the cornerstone of our centre. With a visionary approach and a deep commitment to early childhood development, Ali ensures our facility operates with the highest standards of care, safety, and educational excellence—fostering a supportive and collaborative culture for both our team and the families we serve."
+        },
+        {
+          "name": "Sue",
+          "role": "Manager (IT, ECE)",
+          "photo": "",
+          "bio": "Sue brings academic depth, practical experience, and heartfelt dedication to her role as Manager. She holds a Ph.D. in Child Behaviour and an Infant and Toddler certificate, with years of early childhood education experience in Canada and prior teaching abroad, plus a background in accounting for strong organizational leadership. As a parent herself, she understands how much families value a safe, inclusive, and developmentally rich environment—and she leads our team with professionalism, warmth, and integrity."
+        }
       ]
     },
     {
       "id": "educators",
       "title": "Educators",
       "members": [
-        { "name": "Olivia", "role": "ECE (Infant & Toddler)", "photo": "" },
-        { "name": "Sepideh", "role": "ECE", "photo": "" },
-        { "name": "Pari", "role": "ECEA", "photo": "" },
-        { "name": "Elli", "role": "ECEA", "photo": "" },
-        { "name": "Kulvir", "role": "ECEA", "photo": "" },
-        { "name": "Sevin", "role": "ECEA", "photo": "" }
+        {
+          "name": "Olivia",
+          "role": "ECE (Infant & Toddler)",
+          "photo": "",
+          "bio": "Inspired by her mother, a kindergarten teacher, Olivia discovered a love of early learning early on. She graduated in Korea before furthering her studies in Early Childhood Education in Canada. With over a decade of experience, she connects with children through reading and creative activities, supporting each child’s growth through meaningful play and exploration."
+        },
+        {
+          "name": "Sepideh",
+          "role": "ECE",
+          "photo": "",
+          "bio": "Sepideh is a certified Early Childhood Educator who previously earned a nursing degree—bringing a uniquely caring and attentive approach to licensed childcare since 2019. She is passionate about safe, engaging, nurturing environments and finds joy in being part of each child’s early learning journey."
+        },
+        {
+          "name": "Pari",
+          "role": "ECEA",
+          "photo": "",
+          "bio": "Pari holds a Bachelor’s degree in Psychology and over five years of experience with children, including those with additional needs. She has been a dedicated teacher assistant at our centre while completing her ECE studies. She loves creating a safe, fun space where children can grow, learn, and explore—with patience, creativity, and strong partnership with families."
+        },
+        {
+          "name": "Elli",
+          "role": "ECEA",
+          "photo": "",
+          "bio": "Elli is an enthusiastic Early Childhood Education Assistant with experience across toddler through school-age groups. She believes every child brings a unique spark and feels privileged to support their growth, learning, and creativity—with reliability, kindness, patience, and teamwork at the heart of her practice."
+        },
+        {
+          "name": "Kulvir",
+          "role": "ECEA",
+          "photo": "",
+          "bio": "With a background in human resources and ECEA certification, Kulvir creates a nurturing environment for young learners. She believes creative ideas transform learning, fosters curiosity in the classroom, and brings an artistic, thoughtful presence—guided by simple living and high thinking—to help each child blossom with confidence and compassion."
+        },
+        {
+          "name": "Sevin",
+          "role": "ECEA",
+          "photo": "",
+          "bio": "Sevin supports our classrooms as an Early Childhood Educator Assistant—helping with routines, play-based learning, and the little moments that make each child feel seen and cared for alongside our ECE team."
+        }
       ]
     }
   ],

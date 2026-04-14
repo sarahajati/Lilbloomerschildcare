@@ -320,6 +320,10 @@
               '" /></label>' +
               '<label class="admin-file-label">Or upload photo (JPEG/PNG/WebP, optional)' +
               '<input type="file" class="m-photo-file" accept="image/*" /></label>' +
+              '<label class="m-bio-label">Introduction (optional — shown when visitors tap this person on the site)' +
+              '<textarea class="m-bio" rows="5">' +
+              escapeHtml(m.bio || "") +
+              "</textarea></label>" +
               '<button type="button" class="btn btn-small btn-danger-outline remove-member">Remove person</button>' +
               "</div>"
             );
@@ -345,7 +349,7 @@
       btn.addEventListener("click", function () {
         var gi = parseInt(btn.getAttribute("data-group"), 10);
         if (!state.staffGroups[gi]) return;
-        state.staffGroups[gi].members.push({ name: "", role: "", photo: "" });
+        state.staffGroups[gi].members.push({ name: "", role: "", photo: "", bio: "" });
         renderStaffEditor();
         renderGalleryEditor();
       });
@@ -398,6 +402,7 @@
             photo:
               (row.querySelector(".m-photo-url") && row.querySelector(".m-photo-url").value.trim()) ||
               "",
+            bio: (row.querySelector(".m-bio") && row.querySelector(".m-bio").value) || "",
           });
         });
         if (state.staffGroups[gi]) {
@@ -508,6 +513,7 @@
               name: m.name.trim(),
               role: m.role.trim(),
               photo: (m.photo || "").trim(),
+              bio: (m.bio != null ? String(m.bio) : "").trim(),
             };
           }),
         };

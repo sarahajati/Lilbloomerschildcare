@@ -869,6 +869,138 @@ a:hover {
   color: #ffc9c9;
 }
 
+/* Ambient gallery (between About and Programs) */
+.gallery-ambient {
+  position: relative;
+  width: 100vw;
+  max-width: 100vw;
+  margin-left: calc(50% - 50vw);
+  min-height: clamp(200px, 30vh, 380px);
+  overflow: hidden;
+  background: var(--color-bg-alt);
+}
+
+.gallery-ambient__slides {
+  position: absolute;
+  inset: 0;
+}
+
+.gallery-ambient__slide {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 1.4s ease;
+  pointer-events: none;
+}
+
+.gallery-ambient__slide.is-active {
+  opacity: 1;
+}
+
+.gallery-ambient__slide img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scale(1.04);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gallery-ambient__slide {
+    transition: none;
+  }
+
+  .gallery-ambient__slide img {
+    transform: none;
+  }
+}
+
+.gallery-ambient__scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(250, 248, 243, 0.15) 0%,
+    rgba(250, 248, 243, 0.35) 40%,
+    rgba(250, 248, 243, 0.55) 100%
+  );
+  pointer-events: none;
+}
+
+/* Staff bio dialog */
+.staff-bio-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  display: grid;
+  place-items: center;
+  padding: 1.25rem;
+}
+
+.staff-bio-modal[hidden] {
+  display: none !important;
+}
+
+.staff-bio-modal__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(20, 28, 24, 0.55);
+  cursor: pointer;
+}
+
+.staff-bio-modal__panel {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 520px);
+  max-height: min(88vh, 640px);
+  overflow: auto;
+  background: var(--color-surface);
+  border-radius: var(--radius);
+  border: 1px solid var(--color-line);
+  box-shadow: var(--shadow-md);
+  padding: 1.75rem 1.5rem 1.5rem;
+}
+
+.staff-bio-modal__x {
+  position: absolute;
+  top: 0.65rem;
+  right: 0.65rem;
+  width: 2.25rem;
+  height: 2.25rem;
+  border: none;
+  border-radius: 999px;
+  background: var(--color-bg-alt);
+  color: var(--color-text);
+  font-size: 1.35rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.staff-bio-modal__x:hover {
+  background: var(--color-line);
+}
+
+.staff-bio-modal__title {
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  margin: 0 2rem 0.35rem 0;
+  padding-right: 0.5rem;
+}
+
+.staff-bio-modal__role {
+  margin: 0 0 1rem;
+  color: var(--color-accent-dark);
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.staff-bio-modal__body {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: 1rem;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
 /* Dynamic team */
 .team-mount {
   min-height: 4rem;
@@ -903,6 +1035,30 @@ a:hover {
   border-radius: var(--radius);
   padding: 1.25rem 1rem;
   box-shadow: var(--shadow-sm);
+}
+
+.staff-card--has-bio {
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.staff-card--has-bio:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+}
+
+.staff-card--has-bio:focus {
+  outline: 3px solid var(--color-accent);
+  outline-offset: 3px;
+}
+
+.staff-card--has-bio:focus:not(:focus-visible) {
+  outline: none;
+}
+
+.staff-card--has-bio:focus-visible {
+  outline: 3px solid var(--color-accent);
+  outline-offset: 3px;
 }
 
 .staff-avatar-wrap {

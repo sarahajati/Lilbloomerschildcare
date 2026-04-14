@@ -301,6 +301,29 @@ a.btn.ghost {
   color: var(--muted);
 }
 
+.m-bio-label {
+  grid-column: 1 / -1;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.m-bio-label textarea.m-bio {
+  margin-top: 0.35rem;
+  width: 100%;
+  min-height: 6.5rem;
+  padding: 0.5rem 0.6rem;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: #0c100e;
+  color: var(--text);
+  font: inherit;
+  font-weight: 400;
+  line-height: 1.45;
+  resize: vertical;
+  color-scheme: dark;
+}
+
 .admin-row input[type="text"],
 .admin-row input[type="password"] {
   margin-top: 0.25rem;

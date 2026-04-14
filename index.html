@@ -14,7 +14,7 @@
       href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400&family=Source+Sans+3:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="styles.css?v=10" />
   </head>
   <body id="top">
     <a class="skip-link" href="#main">Skip to content</a>
@@ -118,6 +118,16 @@
             </div>
           </div>
         </div>
+      </section>
+
+      <section
+        id="gallery-ambient"
+        class="gallery-ambient"
+        aria-label="Daycare photo showcase"
+        hidden
+      >
+        <div class="gallery-ambient__slides" data-ambient-slides></div>
+        <div class="gallery-ambient__scrim" aria-hidden="true"></div>
       </section>
 
       <section id="programs" class="section">
@@ -252,7 +262,8 @@
             <h2>Meet our team</h2>
             <p class="section-lead">
               We are more than educators — we are a family of professionals dedicated to your
-              child&rsquo;s early years.
+              child&rsquo;s early years. Tap a team member to read their introduction when one is
+              available.
             </p>
           </div>
           <div id="team-mount" class="team-mount" aria-busy="true"></div>
@@ -268,7 +279,9 @@
           <div class="section-head">
             <h2 id="gallery-heading">Daycare gallery</h2>
             <p class="section-lead">
-              Moments from our classrooms, gym, and outdoor play — updated as we grow.
+              Moments from our classrooms, gym, and outdoor play — updated as we grow. These same
+              photos power the wide photo band above <em>Our programs</em> when you add at least one
+              image here.
             </p>
           </div>
           <p class="gallery-empty" data-gallery-empty hidden>
@@ -447,7 +460,26 @@
       </div>
     </footer>
 
+    <div
+      id="staff-bio-modal"
+      class="staff-bio-modal"
+      hidden
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="staff-bio-modal-title"
+    >
+      <div class="staff-bio-modal__backdrop" data-staff-bio-close tabindex="-1"></div>
+      <div class="staff-bio-modal__panel" role="document">
+        <button type="button" class="staff-bio-modal__x" data-staff-bio-close aria-label="Close dialog">
+          &times;
+        </button>
+        <h2 id="staff-bio-modal-title" class="staff-bio-modal__title"></h2>
+        <p class="staff-bio-modal__role"></p>
+        <div class="staff-bio-modal__body"></div>
+      </div>
+    </div>
+
     <script src="config.js"></script>
-    <script src="script.js?v=8"></script>
+    <script src="script.js?v=9"></script>
   </body>
 </html>
