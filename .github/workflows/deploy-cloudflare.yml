@@ -1,8 +1,12 @@
 # Deploy Worker + static assets on push to main (manual re-run: Actions → Run workflow).
 #
-# GitHub → Settings → Secrets and variables → Actions:
-#   CLOUDFLARE_API_TOKEN — required. Create at https://dash.cloudflare.com/profile/api-tokens
-#   (template "Edit Cloudflare Workers", or Workers Scripts:Edit + Workers KV Storage:Edit).
+# Required repository secret (NOT “Variables”): CLOUDFLARE_API_TOKEN
+#   GitHub: repo → Settings → Secrets and variables → Actions → “New repository secret”
+#   Name must match exactly: CLOUDFLARE_API_TOKEN
+#   Value: API token from https://dash.cloudflare.com/profile/api-tokens
+#   Use template “Edit Cloudflare Workers”, or include Workers Scripts:Edit + Workers KV Storage:Edit.
+#
+# If the token is only on a GitHub “Environment”, add `environment: that-env-name` to the job below.
 
 name: Deploy Cloudflare Worker
 
@@ -19,14 +23,29 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Check Cloudflare token secret
+        shell: bash
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          if [[ -z "${CLOUDFLARE_API_TOKEN}" ]]; then
+            echo "::error::Repository secret CLOUDFLARE_API_TOKEN is empty or not defined."
+            echo "Add it under Settings → Secrets and variables → Actions (tab “Actions”, type “Repository secret”)."
+            echo "Do not use a “Variable” for the token; use a Secret named exactly CLOUDFLARE_API_TOKEN."
+            exit 1
+          fi
+          echo "Secret CLOUDFLARE_API_TOKEN is present (value not shown)."
+
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
 
       - name: Install Wrangler
-        run: npm install -g wrangler
+        run: |
+          npm install -g wrangler
+          wrangler --version
 
-      - name: Verify API token
+      - name: Verify API token with Cloudflare
         run: wrangler whoami
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
