@@ -1,0 +1,25 @@
+{
+  "staffGroups": [
+    {
+      "id": "leadership",
+      "title": "Leadership & administration",
+      "members": [
+        { "name": "Ali", "role": "Director & Co-owner", "photo": "" },
+        { "name": "Sue", "role": "Manager (IT, ECE)", "photo": "" }
+      ]
+    },
+    {
+      "id": "educators",
+      "title": "Educators",
+      "members": [
+        { "name": "Olivia", "role": "ECE (Infant & Toddler)", "photo": "" },
+        { "name": "Sepideh", "role": "ECE", "photo": "" },
+        { "name": "Pari", "role": "ECEA", "photo": "" },
+        { "name": "Elli", "role": "ECEA", "photo": "" },
+        { "name": "Kulvir", "role": "ECEA", "photo": "" },
+        { "name": "Sevin", "role": "ECEA", "photo": "" }
+      ]
+    }
+  ],
+  "gallery": []
+}

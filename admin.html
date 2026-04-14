@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en-CA">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Site content — Lil Bloomers</title>
+    <link rel="stylesheet" href="admin.css" />
+  </head>
+  <body>
+    <div id="admin-gate" class="admin-gate">
+      <div class="admin-gate-card">
+        <h1>Staff &amp; photos</h1>
+        <p class="muted">Enter the site PIN to edit team photos and the daycare gallery.</p>
+        <form id="gate-form">
+          <label class="block">
+            PIN
+            <input id="gate-pin" type="password" autocomplete="current-password" required />
+          </label>
+          <button type="submit" class="btn primary">Unlock</button>
+          <p id="gate-error" class="error" role="alert"></p>
+        </form>
+        <p class="fine">
+          Change the default PIN in <code>admin-config.js</code>. For stronger security, restrict
+          <code>/admin.html</code> with
+          <a href="https://developers.cloudflare.com/cloudflare-one/policies/access/">Cloudflare Access</a>.
+        </p>
+        <p class="fine"><a href="index.html">← Back to website</a></p>
+      </div>
+    </div>
+
+    <div id="admin-app" class="admin-app" hidden>
+      <header class="admin-top">
+        <div>
+          <h1>Edit site content</h1>
+          <p class="muted">
+            Changes are not saved to the internet automatically. Download <code>site.json</code> and
+            replace <code>data/site.json</code> in GitHub, then push — your Cloudflare deploy will
+            update.
+          </p>
+        </div>
+        <div class="admin-top-actions">
+          <button type="button" class="btn ghost" id="btn-logout">Lock</button>
+          <a class="btn ghost" href="index.html">View site</a>
+        </div>
+      </header>
+
+      <p id="admin-toast" class="toast" role="status"></p>
+
+      <section class="admin-panel">
+        <h2>Team</h2>
+        <p class="muted">
+          Use a <strong>Photo URL</strong> (e.g. file in the repo under <code>/media/staff/</code>, or
+          a direct image link). Or choose a small file — it will be compressed and stored as a data
+          URL in JSON (fine for a few headshots; large galleries should use URLs + files in
+          <code>/media/</code>).
+        </p>
+        <div id="staff-editor"></div>
+      </section>
+
+      <section class="admin-panel">
+        <h2>Daycare photos</h2>
+        <p class="muted">Add or remove gallery images. Empty caption is OK.</p>
+        <div id="gallery-editor"></div>
+      </section>
+
+      <section class="admin-panel admin-actions">
+        <button type="button" class="btn primary" id="btn-export">Download site.json</button>
+        <label class="btn ghost file-btn">
+          Import JSON
+          <input id="btn-import" type="file" accept="application/json,.json" hidden />
+        </label>
+      </section>
+    </div>
+
+    <script src="admin-config.js"></script>
+    <script src="admin.js"></script>
+  </body>
+</html>

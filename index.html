@@ -16,7 +16,7 @@
     />
     <link rel="stylesheet" href="styles.css" />
   </head>
-  <body>
+  <body id="top">
     <a class="skip-link" href="#main">Skip to content</a>
 
     <header class="site-header">
@@ -48,6 +48,7 @@
             <li><a href="#programs">Programs</a></li>
             <li><a href="#approach">Our Approach</a></li>
             <li><a href="#team">Our Team</a></li>
+            <li><a href="#gallery">Gallery</a></li>
             <li><a href="#contact">Contact</a></li>
           </ul>
           <a class="btn btn-primary nav-cta" href="#contact">Book a tour</a>
@@ -254,30 +255,42 @@
               child&rsquo;s early years.
             </p>
           </div>
-          <div class="team-grid">
-            <div class="team-card">
-              <h3>Leadership &amp; administration</h3>
-              <ul class="team-list">
-                <li><strong>Ali</strong> &mdash; Director &amp; Co-owner</li>
-                <li><strong>Sue</strong> &mdash; Manager (IT, ECE)</li>
-              </ul>
-            </div>
-            <div class="team-card">
-              <h3>Educators</h3>
-              <ul class="team-list">
-                <li><strong>Olivia</strong> &mdash; ECE (Infant &amp; Toddler)</li>
-                <li><strong>Sepideh</strong> &mdash; ECE</li>
-                <li><strong>Pari</strong> &mdash; ECEA</li>
-                <li><strong>Elli</strong> &mdash; ECEA</li>
-                <li><strong>Kulvir</strong> &mdash; ECEA</li>
-                <li><strong>Sevin</strong> &mdash; ECEA</li>
-              </ul>
-            </div>
-          </div>
+          <div id="team-mount" class="team-mount" aria-busy="true"></div>
           <p class="section-footnote">
             Our team includes infant/toddler specialists, ECEs, and ECEAs working together to
             create a calm, stimulating, and inclusive classroom experience.
           </p>
+        </div>
+      </section>
+
+      <section id="gallery" class="section section-alt" aria-labelledby="gallery-heading">
+        <div class="container">
+          <div class="section-head">
+            <h2 id="gallery-heading">Daycare gallery</h2>
+            <p class="section-lead">
+              Moments from our classrooms, gym, and outdoor play — updated as we grow.
+            </p>
+          </div>
+          <p class="gallery-empty" data-gallery-empty hidden>
+            New photos will appear here once they are added through the site editor.
+          </p>
+          <div data-gallery-mount></div>
+          <div
+            class="lightbox"
+            data-lightbox
+            hidden
+            role="dialog"
+            aria-modal="true"
+            aria-label="Enlarged photo"
+          >
+            <button type="button" class="lightbox-close" data-lightbox-close aria-label="Close">
+              &times;
+            </button>
+            <div class="lightbox-inner">
+              <img data-lightbox-img src="" alt="" />
+              <p data-lightbox-caption class="lightbox-caption"></p>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -317,13 +330,13 @@
               >
             </p>
             <p class="fine-print">
-              Replace the social links above with your official Lil Bloomers profiles when
-              ready.
+              Replace the social links with your official Facebook and Instagram URLs when ready.
             </p>
           </div>
           <div class="contact-card">
             <h3>Message us</h3>
-            <form class="contact-form" action="#" method="post">
+            <form id="contact-form" class="contact-form" method="post" novalidate>
+              <input type="checkbox" name="botcheck" class="honeypot" tabindex="-1" autocomplete="off" aria-hidden="true" />
               <label>
                 Your name
                 <input type="text" name="name" autocomplete="name" required />
@@ -340,11 +353,8 @@
                 Message
                 <textarea name="message" rows="4" required></textarea>
               </label>
-              <button class="btn btn-primary" type="submit">Send (demo)</button>
-              <p class="form-note">
-                This form is front-end only. Connect it to your email service or CMS when you
-                host the site.
-              </p>
+              <button class="btn btn-primary" type="submit">Send message</button>
+              <p id="contact-form-status" class="form-status" role="status" aria-live="polite" hidden></p>
             </form>
           </div>
         </div>
@@ -364,7 +374,9 @@
           <ul class="footer-links">
             <li><a href="#programs">Programs</a></li>
             <li><a href="#team">Our team</a></li>
+            <li><a href="#gallery">Gallery</a></li>
             <li><a href="#contact">Contact</a></li>
+            <li><a href="admin.html">Update photos</a></li>
           </ul>
         </div>
         <div>
@@ -379,6 +391,7 @@
       </div>
     </footer>
 
+    <script src="config.js"></script>
     <script src="script.js"></script>
   </body>
 </html>
