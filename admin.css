@@ -254,6 +254,48 @@ a.btn.ghost {
   color-scheme: dark;
 }
 
+/* Native file picker button (Chrome / Edge / Safari) — avoid default white “Choose File” */
+.admin-row input[type="file"],
+.admin-file-label input[type="file"] {
+  max-width: 100%;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.admin-row input[type="file"]::file-selector-button,
+.admin-file-label input[type="file"]::file-selector-button {
+  margin-right: 0.65rem;
+  padding: 0.4rem 0.85rem;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  background: rgba(255, 255, 255, 0.1);
+  color: #f2f8f5;
+  font: inherit;
+  font-weight: 600;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.admin-row input[type="file"]::file-selector-button:hover,
+.admin-file-label input[type="file"]::file-selector-button:hover {
+  background: rgba(255, 255, 255, 0.16);
+  border-color: rgba(91, 212, 160, 0.55);
+}
+
+.admin-row input[type="file"]::-webkit-file-upload-button,
+.admin-file-label input[type="file"]::-webkit-file-upload-button {
+  margin-right: 0.65rem;
+  padding: 0.4rem 0.85rem;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  background: rgba(255, 255, 255, 0.1);
+  color: #f2f8f5;
+  font: inherit;
+  font-weight: 600;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
 .admin-file-label {
   font-size: 0.8rem;
 }

@@ -32,22 +32,22 @@ After a **one-time** Cloudflare setup, anyone with the **admin PIN** + **save to
 ### One-time setup (owner)
 
 1. In [Cloudflare Dashboard](https://dash.cloudflare.com/) open your **Worker** that serves this site (same name as in `wrangler.toml` → `name`, or rename `name` to match your Worker).
-2. **Settings → Bindings → Add** → **KV Namespace** → variable name **`SITE_DATA`** (must match `worker.js`). Create a new namespace if needed.
-3. **Settings → Variables and Secrets** → **Add** → **Secret** → name **`SAVE_TOKEN`**, value = a **long random password** (this is the “save token” staff will type once per browser).
+2. **Settings → Bindings → Add** → **KV Namespace** → variable name **`SITE_DATA`** (recommended) or **`SAVE_DATA`**. Create a namespace first under **Workers & Pages → KV** if the dropdown is empty.
+3. **Settings → Variables and Secrets** → **Add** → **Secret** → name **`SAVE_TOKEN`** or **`save_token`**, value = a **long random password** (the “save token” staff type in admin). Either secret name works with the repo `worker.js`.
 4. Deploy this repo so **`worker.js`** is the Worker entry point and static files use the **`ASSETS`** binding (see [Workers Static Assets](https://developers.cloudflare.com/workers/static-assets/)). If you deploy via **Git**, pushing `wrangler.toml` + `worker.js` is usually enough once the project is linked.
 
 ### Day-to-day (staff)
 
 1. Open **`https://your-domain/admin.html`**, enter the **PIN** from `admin-config.js`.
 2. Edit team / gallery (URLs or small image uploads as before).
-3. Click **Save to website**. The first time, the browser asks for the **save token** (same value as the **`SAVE_TOKEN`** secret). It is then remembered for that browser until **Forget save token**.
+3. Click **Save to website**. The first time, the browser asks for the **save token** (same value as your **`SAVE_TOKEN`** or **`save_token`** secret). It is then remembered for that browser until **Forget save token**.
 4. Refresh the public homepage — it loads data from **`GET /api/site`** (KV), with fallback to `data/site.json` if KV is empty.
 
-Optional: set `LILBLOOMERS_SAVE_TOKEN` in `admin-config.js` to the same string as `SAVE_TOKEN` so trusted browsers skip the prompt (**avoid** in a public Git repo).
+Optional: set `LILBLOOMERS_SAVE_TOKEN` in `admin-config.js` to the same string as your Cloudflare save secret so trusted browsers skip the prompt (**avoid** in a public Git repo).
 
 ### Without cloud setup
 
-**Save to website** returns a clear error until KV + `SAVE_TOKEN` exist. You can still use **Download site.json** and replace `data/site.json` in GitHub.
+**Save to website** returns a clear error until a **KV binding** (`SITE_DATA` or `SAVE_DATA`) and a **save secret** (`SAVE_TOKEN` or `save_token`) exist. You can still use **Download site.json** and replace `data/site.json` in GitHub.
 
 ## Run locally
 

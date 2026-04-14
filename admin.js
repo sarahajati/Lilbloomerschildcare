@@ -186,7 +186,7 @@
           escapeHtml(g.title || "Group") +
           "</legend>" +
           memberRows +
-          '<button type="button" class="btn btn-small add-member" data-group="' +
+          '<button type="button" class="btn btn-small secondary add-member" data-group="' +
           gi +
           '">Add person to this group</button>' +
           "</fieldset>"
@@ -282,7 +282,7 @@
           );
         })
         .join("") +
-      '<button type="button" class="btn btn-small" id="add-gallery-row">Add daycare photo</button>';
+      '<button type="button" class="btn btn-small secondary" id="add-gallery-row">Add daycare photo</button>';
 
     root.querySelectorAll(".g-file").forEach(function (input) {
       input.addEventListener("change", function () {

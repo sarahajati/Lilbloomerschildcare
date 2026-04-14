@@ -1,13 +1,20 @@
 /**
  * Cloudflare Worker: static files + optional cloud save for site JSON (KV).
  *
- * Bindings (Cloudflare dashboard → Workers → your project → Settings):
- *   - KV namespace → variable name SITE_DATA
- *   - Secret SAVE_TOKEN → long random string (same value staff enter as "save token" in admin)
+ * KV binding variable name (pick one in dashboard):
+ *   SITE_DATA  (recommended)  or  SAVE_DATA
  *
- * Without SITE_DATA or SAVE_TOKEN, GET /api/site still works (reads data/site.json from assets);
- * POST /api/site returns 503 until KV + secret are configured.
+ * Secret for POST /api/site (pick one name in dashboard — value is the "save token"):
+ *   SAVE_TOKEN  or  save_token
  */
+function getKv(env) {
+  return env.SITE_DATA || env.SAVE_DATA;
+}
+
+function getSaveSecret(env) {
+  return env.SAVE_TOKEN || env.save_token;
+}
+
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
@@ -15,7 +22,7 @@ export default {
 
     if (path === "/api/site") {
       if (request.method === "GET") {
-        const kv = env.SITE_DATA;
+        const kv = getKv(env);
         if (kv) {
           try {
             const stored = await kv.get("site");
@@ -36,18 +43,18 @@ export default {
       }
 
       if (request.method === "POST") {
-        const kv = env.SITE_DATA;
-        const secret = env.SAVE_TOKEN;
+        const kv = getKv(env);
+        const secret = getSaveSecret(env);
         if (!kv) {
           return jsonErr(
             503,
-            "KV binding SITE_DATA is not set. Add it in the Worker settings, then try again."
+            "No KV namespace bound. In Worker → Settings → Bindings, add KV with variable name SITE_DATA (or SAVE_DATA), then redeploy."
           );
         }
         if (!secret) {
           return jsonErr(
             503,
-            "SAVE_TOKEN secret is not set. Add it under Worker Secrets, then try again."
+            "No save secret found. Add a Worker secret named SAVE_TOKEN or save_token (same value you type in admin), then redeploy."
           );
         }
         const auth = request.headers.get("Authorization") || "";
