@@ -376,12 +376,17 @@
       var wrap = document.createElement("div");
       wrap.className = "gallery-ambient__slide" + (i === 0 ? " is-active" : "");
       wrap.setAttribute("aria-hidden", i === 0 ? "false" : "true");
+      var frame = document.createElement("div");
+      frame.className = "gallery-ambient__frame";
+      var tilt = i % 2 === 0 ? -2.8 : 2.8;
+      frame.style.setProperty("--album-tilt", tilt + "deg");
       var img = document.createElement("img");
       img.src = it.src;
       img.alt = it.alt || "";
       img.loading = i === 0 ? "eager" : "lazy";
       img.decoding = "async";
-      wrap.appendChild(img);
+      frame.appendChild(img);
+      wrap.appendChild(frame);
       mount.appendChild(wrap);
     });
     if (reduced || slides.length < 2) return;
@@ -393,7 +398,7 @@
       cur = (cur + 1) % els.length;
       els[cur].classList.add("is-active");
       els[cur].setAttribute("aria-hidden", "false");
-    }, 6500);
+    }, 5200);
   }
 
   function initContactForm() {

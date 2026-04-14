@@ -14,7 +14,7 @@
       href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400&family=Source+Sans+3:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="styles.css?v=10" />
+    <link rel="stylesheet" href="styles.css?v=11" />
   </head>
   <body id="top">
     <a class="skip-link" href="#main">Skip to content</a>
@@ -89,6 +89,16 @@
         </div>
       </section>
 
+      <section
+        id="gallery-ambient"
+        class="gallery-ambient"
+        aria-label="Daycare photo album"
+        hidden
+      >
+        <div class="gallery-ambient__slides" data-ambient-slides></div>
+        <div class="gallery-ambient__scrim" aria-hidden="true"></div>
+      </section>
+
       <section id="about" class="section section-alt">
         <div class="container narrow">
           <h2>About Lil Bloomers</h2>
@@ -118,16 +128,6 @@
             </div>
           </div>
         </div>
-      </section>
-
-      <section
-        id="gallery-ambient"
-        class="gallery-ambient"
-        aria-label="Daycare photo showcase"
-        hidden
-      >
-        <div class="gallery-ambient__slides" data-ambient-slides></div>
-        <div class="gallery-ambient__scrim" aria-hidden="true"></div>
       </section>
 
       <section id="programs" class="section">
@@ -279,9 +279,9 @@
           <div class="section-head">
             <h2 id="gallery-heading">Daycare gallery</h2>
             <p class="section-lead">
-              Moments from our classrooms, gym, and outdoor play — updated as we grow. These same
-              photos power the wide photo band above <em>Our programs</em> when you add at least one
-              image here.
+              Moments from our classrooms, gym, and outdoor play — updated as we grow. The same
+              photos appear in the rotating album just under the welcome banner when you add at
+              least one image here.
             </p>
           </div>
           <p class="gallery-empty" data-gallery-empty hidden>
@@ -480,6 +480,6 @@
     </div>
 
     <script src="config.js"></script>
-    <script src="script.js?v=9"></script>
+    <script src="script.js?v=10"></script>
   </body>
 </html>
