@@ -54,21 +54,34 @@
     };
   }
 
+  function parseSiteJson(text, label) {
+    try {
+      return normalizeLoaded(JSON.parse(text));
+    } catch (err) {
+      console.warn("Lilbloomers: " + label + " JSON parse failed", err);
+      throw err;
+    }
+  }
+
   function loadSiteData() {
     var bust = "_=" + Date.now();
     return fetch("/api/site?" + bust, { cache: "no-store" })
       .then(function (r) {
         if (!r.ok) throw new Error("api");
-        return r.json();
+        return r.text();
       })
-      .then(normalizeLoaded)
+      .then(function (text) {
+        return parseSiteJson(text, "/api/site");
+      })
       .catch(function () {
         return fetch("data/site.json", { cache: "no-store" })
           .then(function (r2) {
             if (!r2.ok) throw new Error("file");
-            return r2.json();
+            return r2.text();
           })
-          .then(normalizeLoaded)
+          .then(function (text) {
+            return parseSiteJson(text, "data/site.json");
+          })
           .catch(function () {
             return {
               staffGroups: JSON.parse(JSON.stringify(DEFAULT_SITE.staffGroups)),
@@ -81,56 +94,59 @@
   function renderTeam(container, site) {
     if (!container) return;
     var groups = site.staffGroups || [];
-    var html =
-      '<div class="team-showcase">' +
-      groups
-        .map(function (g) {
-          var members = g.members || [];
-          var cards = members
-            .map(function (m) {
-              var photo = (m.photo || "").trim();
-              var hasPhoto =
-                photo.indexOf("http") === 0 ||
-                photo.indexOf("data:") === 0 ||
-                photo.charAt(0) === "/";
-              var avatar = hasPhoto
-                  ? '<img class="staff-photo" src="' +
-                    escapeHtml(photo) +
-                    '" alt="' +
-                    escapeHtml(m.name) +
-                    '" loading="lazy" width="160" height="160" />'
-                  : '<div class="staff-initials" aria-hidden="true">' +
-                    escapeHtml(initials(m.name)) +
-                    "</div>";
-              return (
-                '<article class="staff-card">' +
-                '<div class="staff-avatar-wrap">' +
-                avatar +
-                "</div>" +
-                '<div class="staff-body">' +
-                "<h4>" +
-                escapeHtml(m.name) +
-                "</h4>" +
-                "<p>" +
-                escapeHtml(m.role) +
-                "</p>" +
-                "</div></article>"
-              );
-            })
-            .join("");
-          return (
-            '<div class="staff-group">' +
-            "<h3>" +
-            escapeHtml(g.title) +
-            "</h3>" +
-            '<div class="staff-grid">' +
-            cards +
-            "</div></div>"
-          );
-        })
-        .join("") +
-      "</div>";
-    container.innerHTML = html;
+    var wrap = document.createElement("div");
+    wrap.className = "team-showcase";
+    groups.forEach(function (g) {
+      var grp = document.createElement("div");
+      grp.className = "team-group";
+      var h3 = document.createElement("h3");
+      h3.textContent = g.title || "";
+      grp.appendChild(h3);
+      var grid = document.createElement("div");
+      grid.className = "staff-grid";
+      (g.members || []).forEach(function (m) {
+        var article = document.createElement("article");
+        article.className = "staff-card";
+        var av = document.createElement("div");
+        av.className = "staff-avatar-wrap";
+        var photo = (m.photo || "").trim();
+        var hasPhoto =
+          photo.indexOf("http") === 0 ||
+          photo.indexOf("data:") === 0 ||
+          photo.charAt(0) === "/";
+        if (hasPhoto) {
+          var img = document.createElement("img");
+          img.className = "staff-photo";
+          img.src = photo;
+          img.alt = m.name || "";
+          img.loading = "lazy";
+          img.width = 160;
+          img.height = 160;
+          av.appendChild(img);
+        } else {
+          var ini = document.createElement("div");
+          ini.className = "staff-initials";
+          ini.setAttribute("aria-hidden", "true");
+          ini.textContent = initials(m.name);
+          av.appendChild(ini);
+        }
+        article.appendChild(av);
+        var body = document.createElement("div");
+        body.className = "staff-body";
+        var h4 = document.createElement("h4");
+        h4.textContent = m.name || "";
+        var p = document.createElement("p");
+        p.textContent = m.role || "";
+        body.appendChild(h4);
+        body.appendChild(p);
+        article.appendChild(body);
+        grid.appendChild(article);
+      });
+      grp.appendChild(grid);
+      wrap.appendChild(grp);
+    });
+    container.innerHTML = "";
+    container.appendChild(wrap);
     container.setAttribute("aria-busy", "false");
   }
 
@@ -139,6 +155,22 @@
     var mount = section.querySelector("[data-gallery-mount]");
     var empty = section.querySelector("[data-gallery-empty]");
     if (!mount) return;
+
+    if (section._lilbloomersGalleryEsc) {
+      document.removeEventListener("keydown", section._lilbloomersGalleryEsc);
+      section._lilbloomersGalleryEsc = null;
+    }
+    var lightbox = section.querySelector("[data-lightbox]");
+    var closeBtn = section.querySelector("[data-lightbox-close]");
+    if (section._lilbloomersLbBackdrop && lightbox) {
+      lightbox.removeEventListener("click", section._lilbloomersLbBackdrop);
+      section._lilbloomersLbBackdrop = null;
+    }
+    if (section._lilbloomersLbClose && closeBtn) {
+      closeBtn.removeEventListener("click", section._lilbloomersLbClose);
+      section._lilbloomersLbClose = null;
+    }
+
     var slides = items
       .map(function (it, i) {
         return {
@@ -155,32 +187,29 @@
       return;
     }
     if (empty) empty.hidden = true;
-    mount.innerHTML =
-      '<ul class="gallery-grid">' +
-      slides
-        .map(function (it, i) {
-          var src = it.src;
-          var alt = it.alt;
-          return (
-            '<li><button type="button" class="gallery-tile" data-gallery-index="' +
-            i +
-            '" aria-label="View larger: ' +
-            escapeHtml(alt) +
-            '">' +
-            '<img src="' +
-            escapeHtml(src) +
-            '" alt="' +
-            escapeHtml(alt) +
-            '" loading="lazy" /></button></li>'
-          );
-        })
-        .join("") +
-      "</ul>";
 
-    var lightbox = section.querySelector("[data-lightbox]");
+    mount.innerHTML = "";
+    var ul = document.createElement("ul");
+    ul.className = "gallery-grid";
+    slides.forEach(function (it, i) {
+      var li = document.createElement("li");
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "gallery-tile";
+      btn.setAttribute("data-gallery-index", String(i));
+      btn.setAttribute("aria-label", "View larger: " + (it.alt || ""));
+      var img = document.createElement("img");
+      img.src = it.src;
+      img.alt = it.alt || "";
+      img.loading = "lazy";
+      btn.appendChild(img);
+      li.appendChild(btn);
+      ul.appendChild(li);
+    });
+    mount.appendChild(ul);
+
     var lightboxImg = section.querySelector("[data-lightbox-img]");
     var lightboxCap = section.querySelector("[data-lightbox-caption]");
-    var closeBtn = section.querySelector("[data-lightbox-close]");
 
     function openAt(idx) {
       var n = parseInt(idx, 10);
@@ -207,15 +236,20 @@
       });
     });
 
-    if (closeBtn) closeBtn.addEventListener("click", closeLb);
-    if (lightbox) {
-      lightbox.addEventListener("click", function (e) {
-        if (e.target === lightbox) closeLb();
-      });
+    if (closeBtn) {
+      section._lilbloomersLbClose = closeLb;
+      closeBtn.addEventListener("click", section._lilbloomersLbClose);
     }
-    document.addEventListener("keydown", function galleryEsc(e) {
+    if (lightbox) {
+      section._lilbloomersLbBackdrop = function (e) {
+        if (e.target === lightbox) closeLb();
+      };
+      lightbox.addEventListener("click", section._lilbloomersLbBackdrop);
+    }
+    section._lilbloomersGalleryEsc = function (e) {
       if (e.key === "Escape" && lightbox && !lightbox.hidden) closeLb();
-    });
+    };
+    document.addEventListener("keydown", section._lilbloomersGalleryEsc);
   }
 
   function initContactForm() {

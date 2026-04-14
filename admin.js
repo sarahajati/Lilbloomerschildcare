@@ -431,6 +431,16 @@
     state.gallery = next;
   }
 
+  function hasPendingImageUploads() {
+    var root = document.getElementById("admin-app");
+    if (!root) return false;
+    var inputs = root.querySelectorAll(".m-photo-file, .g-file");
+    for (var i = 0; i < inputs.length; i++) {
+      if (inputs[i].files && inputs[i].files.length) return true;
+    }
+    return false;
+  }
+
   function buildExportObject() {
     readStaffFromDom();
     readGalleryFromDom();
@@ -561,6 +571,9 @@
         var toast = $("#admin-toast");
         assertSaveOriginForCloudSave()
           .then(function () {
+            if (hasPendingImageUploads()) {
+              return Promise.reject(new Error("pending-uploads"));
+            }
             return ensureSaveToken();
           })
           .then(function (token) {
@@ -612,7 +625,13 @@
                   });
                   return;
                 }
-                return r2.json().then(function (remote) {
+                return r2.text().then(function (txt) {
+                  var remote;
+                  try {
+                    remote = txt ? JSON.parse(txt) : {};
+                  } catch (parseErr) {
+                    throw new Error("Could not parse /api/site after save.");
+                  }
                   if (!sitePayloadEqual(out.sent, remote)) {
                     if (toast) toast.textContent = "";
                     showAdminModal({
@@ -624,13 +643,22 @@
                     return;
                   }
                   if (toast) toast.textContent = "";
+                  var gCount = (out.sent.gallery && out.sent.gallery.length) || 0;
+                  var people = 0;
+                  (out.sent.staffGroups || []).forEach(function (g) {
+                    people += (g.members && g.members.length) || 0;
+                  });
                   showAdminModal({
                     variant: "success",
                     title: "Saved",
                     message:
-                      "Your changes are in cloud storage for this deployment.\n\nYou saved from: " +
+                      "Published " +
+                      gCount +
+                      " daycare photo(s) and " +
+                      people +
+                      " team row(s) to the cloud.\n\nYou saved from: " +
                       location.origin +
-                      " — open the homepage on the same host (then hard-refresh: Ctrl+Shift+R or Cmd+Shift+R) so it loads fresh data from /api/site.",
+                      " — open the homepage, go to Team / Gallery, then hard-refresh (Ctrl+Shift+R or Cmd+Shift+R).",
                   });
                 });
               })
@@ -653,6 +681,16 @@
                 title: "Cannot save from disk",
                 message:
                   "Open admin from your HTTPS website (e.g. https://your-domain/admin.html), not by double-clicking the file on your computer.",
+              });
+              return;
+            }
+            if (e && e.message === "pending-uploads") {
+              if (toast) toast.textContent = "";
+              showAdminModal({
+                variant: "error",
+                title: "Photo still uploading",
+                message:
+                  "A file is still selected or compressing. Wait until the green line says the image is embedded, or clear the file picker, then click Save to website again.",
               });
               return;
             }
