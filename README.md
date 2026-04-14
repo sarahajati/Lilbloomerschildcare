@@ -32,7 +32,7 @@ After a **one-time** Cloudflare setup, anyone with the **admin PIN** + **save to
 ### One-time setup (owner)
 
 1. In [Cloudflare Dashboard](https://dash.cloudflare.com/) open your **Worker** that serves this site (same name as in `wrangler.toml` → `name`, or rename `name` to match your Worker).
-2. **Settings → Bindings → Add** → **KV Namespace** → variable name **`SITE_DATA`** (recommended) or **`SAVE_DATA`**. Create a namespace first under **Workers & Pages → KV** if the dropdown is empty.
+2. **KV namespace:** This repo’s `wrangler.toml` binds **`KV`** to your namespace id (so Git deploys keep it). The Worker also accepts **`SITE_DATA`** or **`SAVE_DATA`** if you rename the binding later.
 3. **Save token** (pick one place — same string staff type in admin):
    - **Recommended:** Worker → **Variables and Secrets** → **Secret** → name **`save_token`** or **`SAVE_TOKEN`**.
    - **Also supported:** KV → open your namespace → **KV Pairs** → add key **`save_token`** or **`SAVE_TOKEN`** with that password (if you already added it there, redeploy after pulling the latest `worker.js`).

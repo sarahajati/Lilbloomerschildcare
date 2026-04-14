@@ -1,7 +1,5 @@
 # Cloudflare Workers + static assets (same folder as your HTML/CSS/JS).
-# After connecting this repo, add in the dashboard (or via wrangler):
-#   - KV namespace binding: variable name SITE_DATA
-#   - Secret: SAVE_TOKEN (long random string; share with staff who update photos)
+# KV is declared below so Git deploys keep the binding. Binding name must match worker.js (KV).
 #
 # Docs: https://developers.cloudflare.com/workers/static-assets/
 
@@ -13,12 +11,6 @@ compatibility_date = "2025-04-10"
 directory = "."
 binding = "ASSETS"
 
-# IMPORTANT: Git runs `wrangler deploy`. Bindings you add only in the Cloudflare UI
-# are often REMOVED on the next deploy unless they also exist here.
-#
-# 1. Workers & Pages → KV → your namespace → copy the Namespace ID (UUID).
-# 2. Uncomment the block below and paste the id. Push to Git → bindings stay.
-#
-# [[kv_namespaces]]
-# binding = "SITE_DATA"
-# id = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+[[kv_namespaces]]
+binding = "KV"
+id = "bfac3cd93ad647d5b05219f6d1eb4f48"

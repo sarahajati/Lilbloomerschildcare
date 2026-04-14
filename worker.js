@@ -1,7 +1,7 @@
 /**
  * Cloudflare Worker: static files + optional cloud save for site JSON (KV).
  *
- * KV binding variable name: SITE_DATA or SAVE_DATA
+ * KV binding variable name: KV, SITE_DATA, or SAVE_DATA (first match wins)
  *
  * Save token (same string staff type in admin) can be provided in EITHER place:
  *   A) Worker → Settings → Variables and Secrets → Secret named SAVE_TOKEN or save_token
@@ -9,7 +9,7 @@
  *      we read it as a fallback so that still works).
  */
 function getKv(env) {
-  return env.SITE_DATA || env.SAVE_DATA;
+  return env.KV || env.SITE_DATA || env.SAVE_DATA;
 }
 
 async function resolveSaveSecret(env, kv) {
