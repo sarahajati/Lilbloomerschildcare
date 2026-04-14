@@ -14,7 +14,7 @@
       href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400&family=Source+Sans+3:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="styles.css?v=12" />
+    <link rel="stylesheet" href="styles.css?v=13" />
   </head>
   <body id="top">
     <a class="skip-link" href="#main">Skip to content</a>
@@ -78,25 +78,24 @@
               <li>Indoor gym &amp; outdoor play</li>
             </ul>
           </div>
-          <div class="hero-card" role="presentation">
+          <div class="hero-card" role="region" aria-labelledby="hero-album-heading">
             <div class="hero-card-inner">
-              <p class="hero-card-kicker">Growing together</p>
+              <h2 id="hero-album-heading" class="hero-card-title">Growing together</h2>
               <p class="hero-card-text">
                 Planting the seeds of confidence, curiosity, and joy — every day.
               </p>
+              <section
+                id="gallery-ambient"
+                class="gallery-ambient"
+                aria-label="Photo album preview"
+                hidden
+              >
+                <div class="gallery-ambient__slides" data-ambient-slides></div>
+                <div class="gallery-ambient__scrim" aria-hidden="true"></div>
+              </section>
             </div>
           </div>
         </div>
-      </section>
-
-      <section
-        id="gallery-ambient"
-        class="gallery-ambient"
-        aria-label="Daycare photo album"
-        hidden
-      >
-        <div class="gallery-ambient__slides" data-ambient-slides></div>
-        <div class="gallery-ambient__scrim" aria-hidden="true"></div>
       </section>
 
       <section id="about" class="section section-alt">
@@ -449,7 +448,15 @@
         </div>
         <div>
           <p class="footer-heading">Location</p>
-          <p>195 E Windsor Road<br />North Vancouver, BC</p>
+          <p>
+            <a
+              href="https://www.google.com/maps/dir/?api=1&destination=195+E+Windsor+Road,+North+Vancouver,+BC"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Get directions to Lil Bloomers on Google Maps"
+              >195 E Windsor Road<br />North Vancouver, BC</a
+            >
+          </p>
         </div>
       </div>
       <div class="container footer-bottom">

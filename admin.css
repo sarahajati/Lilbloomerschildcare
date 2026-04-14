@@ -421,3 +421,43 @@ a.btn.ghost {
 .file-btn {
   cursor: pointer;
 }
+
+/* Thumbnail preview next to URL / data-URL fields (team + gallery) */
+.admin-preview-strip {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.35rem 0 0.15rem;
+  margin-bottom: 0.15rem;
+}
+
+.admin-preview-img {
+  flex-shrink: 0;
+  width: 88px;
+  height: 88px;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: rgba(0, 0, 0, 0.28);
+}
+
+.admin-preview-strip--gallery .admin-preview-img {
+  width: 112px;
+  height: 84px;
+}
+
+.admin-preview-img[hidden] {
+  display: none !important;
+}
+
+.admin-preview-empty {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--muted);
+  line-height: 1.35;
+  max-width: min(100%, 20rem);
+}
+
+.admin-preview-empty[hidden] {
+  display: none !important;
+}

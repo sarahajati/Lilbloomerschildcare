@@ -376,7 +376,7 @@ a:hover {
   background: var(--color-surface);
   box-shadow: var(--shadow-md);
   border: 1px solid var(--color-line);
-  min-height: 200px;
+  min-height: 0;
   display: flex;
   align-items: stretch;
 }
@@ -386,19 +386,25 @@ a:hover {
   background: linear-gradient(145deg, var(--color-accent-soft), #fff 55%);
   border-radius: inherit;
   width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
 }
 
-.hero-card-kicker {
+.hero-card-title {
   font-family: var(--font-display);
-  font-size: 1.35rem;
-  font-weight: 600;
-  margin: 0 0 0.5rem;
+  font-size: clamp(1.35rem, 2.4vw, 1.65rem);
+  font-weight: 700;
+  margin: 0;
+  line-height: 1.2;
   color: var(--color-accent-dark);
 }
 
 .hero-card-text {
   margin: 0;
   color: var(--color-muted);
+  font-size: 0.98rem;
+  line-height: 1.45;
 }
 
 .section {
@@ -869,16 +875,17 @@ a:hover {
   color: #ffc9c9;
 }
 
-/* Rotating photo album — directly under hero */
+/* Rotating photo album — inside hero card (“Growing together”) */
 .gallery-ambient {
   position: relative;
-  width: 100vw;
-  max-width: 100vw;
-  margin-left: calc(50% - 50vw);
-  min-height: clamp(260px, 46vh, 540px);
+  width: 100%;
+  margin: 0.35rem 0 0;
+  flex: 1 1 auto;
+  min-height: clamp(168px, 26vw, 260px);
   overflow: hidden;
+  border-radius: 12px;
   background: linear-gradient(185deg, #e4ddd4 0%, var(--color-bg-alt) 42%, #e9e2d8 100%);
-  padding: clamp(0.85rem, 2.5vw, 1.75rem) 0;
+  padding: 0;
 }
 
 .gallery-ambient__slides {
@@ -896,7 +903,7 @@ a:hover {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0.5rem 1rem 1rem;
+  padding: 0.35rem 0.5rem 0.65rem;
   opacity: 0;
   transform: rotateY(88deg);
   transform-origin: center center;
@@ -915,14 +922,15 @@ a:hover {
 }
 
 .gallery-ambient__frame {
-  width: min(94vw, 920px);
+  width: min(100%, 420px);
+  max-width: 100%;
   background: linear-gradient(160deg, #fffefb 0%, #f4f0e8 100%);
-  padding: 0.5rem 0.5rem 1.35rem;
-  border-radius: 5px;
+  padding: 0.4rem 0.4rem 0.75rem;
+  border-radius: 8px;
   box-shadow:
     0 1px 0 rgba(255, 255, 255, 0.95) inset,
-    0 22px 55px rgba(28, 42, 36, 0.2),
-    0 6px 16px rgba(28, 42, 36, 0.1);
+    0 16px 40px rgba(28, 42, 36, 0.16),
+    0 4px 12px rgba(28, 42, 36, 0.08);
   transform: rotate(var(--album-tilt, 0deg));
   transition: transform 0.95s cubic-bezier(0.42, 0, 0.2, 1);
 }
@@ -935,9 +943,9 @@ a:hover {
   display: block;
   width: 100%;
   aspect-ratio: 16 / 10;
-  max-height: min(44vh, 440px);
+  max-height: min(220px, 36vw);
   object-fit: cover;
-  border-radius: 3px;
+  border-radius: 4px;
 }
 
 @media (prefers-reduced-motion: reduce) {

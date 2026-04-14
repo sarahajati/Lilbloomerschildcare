@@ -1,0 +1,22 @@
+# Pushes to main run `wrangler deploy` so the live site updates.
+# Repo → Settings → Secrets → Actions → add CLOUDFLARE_API_TOKEN
+# (Create token: Workers Builds / Edit Cloudflare Workers + needed account scope.)
+
+name: Deploy Cloudflare Worker
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Publish Worker + assets
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}

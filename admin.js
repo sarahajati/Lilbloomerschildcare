@@ -13,6 +13,45 @@
     return div.innerHTML;
   }
 
+  /** Keeps a small thumbnail in sync with a URL or data-URL field (team / gallery). */
+  function bindImagePreview(urlInput, imgEl, emptyEl) {
+    function sync() {
+      var v = (urlInput.value || "").trim();
+      imgEl.onload = function () {
+        if (imgEl.naturalWidth > 0) {
+          emptyEl.hidden = true;
+          imgEl.hidden = false;
+        }
+      };
+      imgEl.onerror = function () {
+        imgEl.removeAttribute("src");
+        imgEl.hidden = true;
+        emptyEl.hidden = false;
+        emptyEl.textContent = v
+          ? "Could not load preview (check the URL or try opening it in a new tab)."
+          : "Nothing to preview yet.";
+      };
+      if (!v) {
+        imgEl.removeAttribute("src");
+        imgEl.hidden = true;
+        emptyEl.hidden = false;
+        emptyEl.textContent = "Nothing to preview yet.";
+        return;
+      }
+      emptyEl.hidden = true;
+      imgEl.hidden = false;
+      imgEl.alt = "";
+      imgEl.src = v;
+      if (imgEl.complete && imgEl.naturalWidth > 0) {
+        emptyEl.hidden = true;
+        imgEl.hidden = false;
+      }
+    }
+    urlInput.addEventListener("input", sync);
+    urlInput.addEventListener("change", sync);
+    sync();
+  }
+
   function getPin() {
     var raw = window.LILBLOOMERS_ADMIN_PIN;
     var s = raw != null ? String(raw).trim() : "";
@@ -304,11 +343,15 @@
         var memberRows = members
           .map(function (m, mi) {
             return (
-              '<div class="admin-row" data-group="' +
+              '<div class="admin-row staff-row" data-group="' +
               gi +
               '" data-member="' +
               mi +
               '">' +
+              '<div class="admin-preview-strip" aria-hidden="true">' +
+              '<img class="admin-preview-img" alt="" decoding="async" loading="lazy" />' +
+              '<span class="admin-preview-empty">Nothing to preview yet.</span>' +
+              "</div>" +
               '<label>Name <input type="text" class="m-name" value="' +
               escapeHtml(m.name) +
               '" /></label>' +
@@ -378,7 +421,10 @@
         resizeImageFile(file, lim.staffMaxW, lim.staffMaxBytes, lim.quality)
           .then(function (dataUrl) {
             var urlInput = row.querySelector(".m-photo-url");
-            if (urlInput) urlInput.value = dataUrl;
+            if (urlInput) {
+              urlInput.value = dataUrl;
+              urlInput.dispatchEvent(new Event("input", { bubbles: true }));
+            }
             input.value = "";
             $("#admin-toast").textContent = "Photo compressed and pasted into Photo URL.";
           })
@@ -386,6 +432,13 @@
             $("#admin-toast").textContent = e.message || "Could not use that image.";
           });
       });
+    });
+
+    root.querySelectorAll(".staff-row").forEach(function (row) {
+      var urlInput = row.querySelector(".m-photo-url");
+      var img = row.querySelector(".admin-preview-img");
+      var empty = row.querySelector(".admin-preview-empty");
+      if (urlInput && img && empty) bindImagePreview(urlInput, img, empty);
     });
   }
 
@@ -422,6 +475,10 @@
             '<div class="admin-row gallery-row" data-gallery-index="' +
             i +
             '">' +
+            '<div class="admin-preview-strip admin-preview-strip--gallery" aria-hidden="true">' +
+            '<img class="admin-preview-img" alt="" decoding="async" loading="lazy" />' +
+            '<span class="admin-preview-empty">Nothing to preview yet.</span>' +
+            "</div>" +
             '<label>Image URL <input type="text" class="g-src" value="' +
             escapeHtml(it.src) +
             '" placeholder="https://… or /media/gallery/photo.jpg" /></label>' +
@@ -446,7 +503,10 @@
         resizeImageFile(file, lim.galleryMaxW, lim.galleryMaxBytes, lim.quality)
           .then(function (dataUrl) {
             var srcInput = row.querySelector(".g-src");
-            if (srcInput) srcInput.value = dataUrl;
+            if (srcInput) {
+              srcInput.value = dataUrl;
+              srcInput.dispatchEvent(new Event("input", { bubbles: true }));
+            }
             input.value = "";
             $("#admin-toast").textContent = "Image embedded (large galleries: prefer URLs + files in /media/).";
           })
@@ -475,6 +535,13 @@
         renderGalleryEditor();
       });
     }
+
+    root.querySelectorAll(".gallery-row").forEach(function (row) {
+      var srcInput = row.querySelector(".g-src");
+      var img = row.querySelector(".admin-preview-img");
+      var empty = row.querySelector(".admin-preview-empty");
+      if (srcInput && img && empty) bindImagePreview(srcInput, img, empty);
+    });
   }
 
   function readGalleryFromDom() {
