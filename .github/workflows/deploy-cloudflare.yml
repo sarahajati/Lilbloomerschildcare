@@ -1,11 +1,8 @@
-# Pushes to main run `wrangler deploy` so the live site updates.
+# Deploy Worker + static assets on push to main (manual re-run: Actions → Run workflow).
 #
 # GitHub → Settings → Secrets and variables → Actions:
-#   CLOUDFLARE_API_TOKEN — required (see https://developers.cloudflare.com/fundamentals/api/get-started/create-token/)
-#   Use template "Edit Cloudflare Workers" or include: Workers Scripts:Edit, Workers KV Storage:Edit,
-#   Account Settings:Read (exact names may vary slightly in the dashboard).
-#
-# If deploy still fails, open the failed job log and search for ERROR.
+#   CLOUDFLARE_API_TOKEN — required. Create at https://dash.cloudflare.com/profile/api-tokens
+#   (template "Edit Cloudflare Workers", or Workers Scripts:Edit + Workers KV Storage:Edit).
 
 name: Deploy Cloudflare Worker
 
@@ -22,7 +19,19 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Publish Worker + assets
-        uses: cloudflare/wrangler-action@v3
+      - uses: actions/setup-node@v4
         with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          node-version: "22"
+
+      - name: Install Wrangler
+        run: npm install -g wrangler
+
+      - name: Verify API token
+        run: wrangler whoami
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+
+      - name: Deploy Worker and assets
+        run: wrangler deploy
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}

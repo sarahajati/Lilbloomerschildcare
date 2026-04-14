@@ -1,0 +1,11 @@
+# Static asset upload excludes (same rules as .gitignore). Repo root is the assets directory.
+# Without this, Wrangler tries to upload .git from CI — huge and fails deploy.
+
+.git
+.github
+.wrangler
+node_modules
+
+# Worker entry is deployed separately; do not publish as a raw static file
+worker.js
+wrangler.toml
