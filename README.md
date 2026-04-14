@@ -45,13 +45,13 @@ After a **one-time** Cloudflare setup, anyone with the **admin PIN** + **save to
 1. Open **`https://your-domain/admin.html`**, enter the **PIN** from `admin-config.js`.
 2. Edit team / gallery (URLs or small image uploads as before).
 3. Click **Save to website**. The first time, the browser asks for the **save token** (same value as your **`SAVE_TOKEN`** or **`save_token`** secret). It is then remembered for that browser until **Forget save token**.
-4. Refresh the public homepage — it loads data from **`GET /api/site`** (KV), with fallback to `data/site.json` if KV is empty.
+4. Open the **public homepage on the same hostname** you used for admin, then **hard-refresh** (Ctrl+Shift+R / Cmd+Shift+R). It loads from **`GET /api/site`** (KV), with fallback to `data/site.json` if KV is empty.
 
 Optional: set `LILBLOOMERS_SAVE_TOKEN` in `admin-config.js` to the same string as your Cloudflare save secret so trusted browsers skip the prompt (**avoid** in a public Git repo).
 
 ### Without cloud setup
 
-**Save to website** returns a clear error until a **KV binding** (`SITE_DATA` or `SAVE_DATA`) and a **save secret** (`SAVE_TOKEN` or `save_token`) exist. You can still use **Download site.json** and replace `data/site.json` in GitHub.
+**Save to website** returns a clear error until a **KV binding** (`KV`, `SITE_DATA`, or `SAVE_DATA`) and a **save secret** (`SAVE_TOKEN` or `save_token`) exist. You can still use **Download site.json** and replace `data/site.json` in GitHub.
 
 ## Run locally
 
@@ -82,6 +82,12 @@ If **KV** (or other bindings) were added **only** under **Worker → Settings �
 **Secrets** (`save_token`, etc.) added under **Variables and Secrets** can be affected the same way if your deploy pipeline replaces config; keeping secrets in the dashboard is common, but **KV namespace bindings** should live in **`wrangler.toml`** so Git deploys stay consistent.
 
 Also double-check you are not looking at a **preview** deployment vs **production**, or a **different Worker** name, when comparing bindings.
+
+### “Save to website” works but the live homepage never changes
+
+1. **Use admin on the real site:** Open **`https://your-domain/admin.html`**, not a copy opened from disk (`file://`) and not only `http://localhost` while testing with `wrangler dev`, unless you intend to update **preview** KV. Saving from `file://` does not reach Cloudflare; saving from `wrangler dev` usually writes a **different** KV than production.
+2. **Same hostname for admin and homepage:** After saving, load **`index.html` on that same domain** and hard-refresh so the browser is not showing a restored back/forward cache tab.
+3. **Check what the Worker serves:** In a terminal, `curl -sI "https://your-domain/api/site"` — response header **`x-lilbloomers-site-source: kv`** means KV has a `site` key; **`bundled`** means KV is empty and the bundled `data/site.json` is used.
 
 ## License
 

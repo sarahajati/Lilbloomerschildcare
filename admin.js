@@ -50,6 +50,45 @@
   var modalBackdropHandler = null;
   var modalKeyHandler = null;
 
+  function refreshOriginWarning() {
+    var el = $("#admin-origin-warn");
+    if (!el) return;
+    el.classList.remove("admin-origin-warn--info");
+    if (location.protocol === "file:") {
+      el.hidden = false;
+      el.textContent =
+        "This page was opened from your computer (file://). “Save to website” cannot update the live site. Host the site on Cloudflare and open admin at https://YOUR-DOMAIN/admin.html instead.";
+      return;
+    }
+    var h = (location.hostname || "").toLowerCase();
+    if (h === "localhost" || h === "127.0.0.1") {
+      el.hidden = false;
+      el.classList.add("admin-origin-warn--info");
+      el.textContent =
+        "Dev URL: “Save to website” writes to this environment’s KV (wrangler dev / preview), which is usually not the same data the public domain reads. To update the live website, open admin on your real HTTPS domain.";
+      return;
+    }
+    el.hidden = true;
+    el.textContent = "";
+  }
+
+  function assertSaveOriginForCloudSave() {
+    if (location.protocol === "file:") {
+      return Promise.reject(new Error("file-protocol"));
+    }
+    var h = (location.hostname || "").toLowerCase();
+    if (h === "localhost" || h === "127.0.0.1" || h === "[::1]") {
+      var msg =
+        "You are on " +
+        location.origin +
+        ".\n\nSaving here updates THIS environment’s KV (often preview), not necessarily your public website.\n\nPress OK to save here anyway, or Cancel.";
+      if (!window.confirm(msg)) {
+        return Promise.reject(new Error("cancel"));
+      }
+    }
+    return Promise.resolve();
+  }
+
   function showAdminModal(opts) {
     var root = $("#admin-modal-root");
     var titleEl = $("#admin-modal-title");
@@ -501,6 +540,7 @@
   function bootApp() {
     if (booted) return;
     booted = true;
+    refreshOriginWarning();
     fetchSite()
       .then(function (data) {
         state = data;
@@ -519,7 +559,10 @@
     if (btnSaveLive) {
       btnSaveLive.addEventListener("click", function () {
         var toast = $("#admin-toast");
-        ensureSaveToken()
+        assertSaveOriginForCloudSave()
+          .then(function () {
+            return ensureSaveToken();
+          })
           .then(function (token) {
             var obj = buildExportObject();
             return fetch("/api/site", {
@@ -585,7 +628,9 @@
                     variant: "success",
                     title: "Saved",
                     message:
-                      "Your changes are in cloud storage. Open the homepage and hard-refresh (Ctrl+Shift+R on Windows, Cmd+Shift+R on Mac) so the browser does not reuse an old copy.",
+                      "Your changes are in cloud storage for this deployment.\n\nYou saved from: " +
+                      location.origin +
+                      " — open the homepage on the same host (then hard-refresh: Ctrl+Shift+R or Cmd+Shift+R) so it loads fresh data from /api/site.",
                   });
                 });
               })
@@ -601,6 +646,16 @@
               });
           })
           .catch(function (e) {
+            if (e && e.message === "file-protocol") {
+              if (toast) toast.textContent = "";
+              showAdminModal({
+                variant: "error",
+                title: "Cannot save from disk",
+                message:
+                  "Open admin from your HTTPS website (e.g. https://your-domain/admin.html), not by double-clicking the file on your computer.",
+              });
+              return;
+            }
             if (e && e.message === "cancel") {
               if (toast) toast.textContent = "Save cancelled. You can still use Download site.json.";
               return;

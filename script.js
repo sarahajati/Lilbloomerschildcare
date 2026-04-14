@@ -317,10 +317,16 @@
 
   var teamMount = document.getElementById("team-mount");
   var gallerySection = document.getElementById("gallery");
+  function applySiteDataToPage(site) {
+    if (teamMount) renderTeam(teamMount, site);
+    if (gallerySection) renderGallery(gallerySection, site);
+  }
   if (teamMount || gallerySection) {
-    loadSiteData().then(function (site) {
-      if (teamMount) renderTeam(teamMount, site);
-      if (gallerySection) renderGallery(gallerySection, site);
+    loadSiteData().then(applySiteDataToPage);
+    window.addEventListener("pageshow", function (ev) {
+      if (ev.persisted) {
+        loadSiteData().then(applySiteDataToPage);
+      }
     });
   }
 })();

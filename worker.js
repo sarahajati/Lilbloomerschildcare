@@ -48,6 +48,7 @@ export default {
                   "content-type": "application/json; charset=utf-8",
                   "cache-control": "no-store, max-age=0",
                   "cdn-cache-control": "no-store",
+                  "x-lilbloomers-site-source": "kv",
                 },
               });
             }
@@ -63,6 +64,7 @@ export default {
         headers.set("content-type", "application/json; charset=utf-8");
         headers.set("cache-control", "no-store, max-age=0");
         headers.set("cdn-cache-control", "no-store");
+        headers.set("x-lilbloomers-site-source", "bundled");
         return new Response(assetResp.body, {
           status: assetResp.status,
           headers,

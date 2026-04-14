@@ -197,6 +197,23 @@ a.btn.ghost {
   color: var(--accent);
 }
 
+.admin-origin-warn {
+  margin: 0 0 1rem;
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  border: 1px solid rgba(240, 168, 168, 0.45);
+  background: rgba(240, 168, 168, 0.08);
+  color: var(--danger);
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+.admin-origin-warn--info {
+  border-color: var(--line);
+  background: rgba(91, 212, 160, 0.06);
+  color: var(--text);
+}
+
 .admin-modal-root {
   position: fixed;
   inset: 0;
