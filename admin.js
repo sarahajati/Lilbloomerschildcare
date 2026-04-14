@@ -43,8 +43,64 @@
     return { staffGroups: staffGroups, gallery: gallery };
   }
 
+  function sitePayloadEqual(a, b) {
+    return JSON.stringify(normalizeData(a)) === JSON.stringify(normalizeData(b));
+  }
+
+  var modalBackdropHandler = null;
+  var modalKeyHandler = null;
+
+  function showAdminModal(opts) {
+    var root = $("#admin-modal-root");
+    var titleEl = $("#admin-modal-title");
+    var bodyEl = $("#admin-modal-body");
+    var okBtn = $("#admin-modal-ok");
+    var card = root ? root.querySelector(".admin-modal") : null;
+    if (!root || !titleEl || !bodyEl || !okBtn || !card) return;
+
+    if (modalKeyHandler) {
+      document.removeEventListener("keydown", modalKeyHandler);
+      modalKeyHandler = null;
+    }
+    if (modalBackdropHandler) {
+      root.removeEventListener("click", modalBackdropHandler);
+      modalBackdropHandler = null;
+    }
+
+    titleEl.textContent = opts.title || "Notice";
+    bodyEl.textContent = opts.message || "";
+    card.classList.toggle("admin-modal--error", opts.variant === "error");
+    root.hidden = false;
+
+    function close() {
+      root.hidden = true;
+      card.classList.remove("admin-modal--error");
+      okBtn.removeEventListener("click", close);
+      if (modalBackdropHandler) {
+        root.removeEventListener("click", modalBackdropHandler);
+        modalBackdropHandler = null;
+      }
+      if (modalKeyHandler) {
+        document.removeEventListener("keydown", modalKeyHandler);
+        modalKeyHandler = null;
+      }
+    }
+
+    modalBackdropHandler = function (e) {
+      if (e.target === root) close();
+    };
+    modalKeyHandler = function (e) {
+      if (e.key === "Escape") close();
+    };
+
+    okBtn.addEventListener("click", close);
+    root.addEventListener("click", modalBackdropHandler);
+    document.addEventListener("keydown", modalKeyHandler);
+    okBtn.focus();
+  }
+
   function fetchSite() {
-    return fetch("/api/site", { cache: "no-store" })
+    return fetch("/api/site?_=" + Date.now(), { cache: "no-store" })
       .then(function (r) {
         if (!r.ok) throw new Error("api");
         return r.json();
@@ -479,7 +535,7 @@
                 try {
                   body = txt ? JSON.parse(txt) : {};
                 } catch (ignore) {}
-                return { r: r, body: body };
+                return { r: r, body: body, sent: obj };
               });
             });
           })
@@ -499,10 +555,50 @@
             if (!out.r.ok) {
               throw new Error((out.body && out.body.error) || "Save failed (" + out.r.status + ").");
             }
-            if (toast) {
-              toast.textContent =
-                "Saved. The public site will load this data from the cloud on the next visit (refresh the homepage).";
-            }
+            return fetch("/api/site?_=" + Date.now(), { cache: "no-store" })
+              .then(function (r2) {
+                if (!r2.ok) {
+                  if (toast) toast.textContent = "";
+                  showAdminModal({
+                    variant: "error",
+                    title: "Saved, but read-back failed",
+                    message:
+                      "The server accepted the update, but reloading /api/site returned HTTP " +
+                      r2.status +
+                      ". Open the homepage and try a hard refresh (Ctrl+Shift+R). If it still fails, check Worker routes in Cloudflare.",
+                  });
+                  return;
+                }
+                return r2.json().then(function (remote) {
+                  if (!sitePayloadEqual(out.sent, remote)) {
+                    if (toast) toast.textContent = "";
+                    showAdminModal({
+                      variant: "error",
+                      title: "Data mismatch after save",
+                      message:
+                        "The save reported success, but /api/site did not return the same data. Often this is CDN or browser cache serving an old JSON file. Redeploy the Worker (wrangler deploy), then hard-refresh the homepage.",
+                    });
+                    return;
+                  }
+                  if (toast) toast.textContent = "";
+                  showAdminModal({
+                    variant: "success",
+                    title: "Saved",
+                    message:
+                      "Your changes are in cloud storage. Open the homepage and hard-refresh (Ctrl+Shift+R on Windows, Cmd+Shift+R on Mac) so the browser does not reuse an old copy.",
+                  });
+                });
+              })
+              .catch(function (e) {
+                if (toast) toast.textContent = "";
+                showAdminModal({
+                  variant: "error",
+                  title: "Could not verify save",
+                  message:
+                    (e && e.message) ||
+                    "Network error while reading /api/site. The write may still have succeeded—try the homepage with a hard refresh.",
+                });
+              });
           })
           .catch(function (e) {
             if (e && e.message === "cancel") {
@@ -510,10 +606,19 @@
               return;
             }
             if (e && e.message === "storage") {
-              if (toast) toast.textContent = "Could not remember the token in this browser.";
+              showAdminModal({
+                variant: "error",
+                title: "Storage blocked",
+                message: "This browser would not store the save token. Allow site data for this domain or try another browser.",
+              });
               return;
             }
-            if (toast) toast.textContent = e.message || "Could not save.";
+            if (toast) toast.textContent = "";
+            showAdminModal({
+              variant: "error",
+              title: "Could not save",
+              message: e.message || "Could not save.",
+            });
           });
       });
     }

@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="robots" content="noindex, nofollow" />
     <title>Site content — Lil Bloomers</title>
-    <link rel="stylesheet" href="admin.css?v=4" />
+    <link rel="stylesheet" href="admin.css?v=5" />
   </head>
   <body>
     <div id="admin-gate" class="admin-gate">
@@ -52,6 +52,19 @@
 
       <p id="admin-toast" class="toast" role="status"></p>
 
+      <div id="admin-modal-root" class="admin-modal-root" hidden>
+        <div
+          class="admin-modal"
+          role="alertdialog"
+          aria-modal="true"
+          aria-labelledby="admin-modal-title"
+        >
+          <h2 id="admin-modal-title" class="admin-modal-title">Notice</h2>
+          <p id="admin-modal-body" class="admin-modal-body"></p>
+          <button type="button" class="btn primary" id="admin-modal-ok">OK</button>
+        </div>
+      </div>
+
       <section class="admin-panel">
         <h2>Team</h2>
         <p class="muted">
@@ -85,7 +98,7 @@
       </section>
     </div>
 
-    <script src="admin-config.js?v=4"></script>
-    <script src="admin.js?v=4"></script>
+    <script src="admin-config.js?v=5"></script>
+    <script src="admin.js?v=5"></script>
   </body>
 </html>

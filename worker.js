@@ -46,7 +46,8 @@ export default {
               return new Response(stored, {
                 headers: {
                   "content-type": "application/json; charset=utf-8",
-                  "cache-control": "no-store",
+                  "cache-control": "no-store, max-age=0",
+                  "cdn-cache-control": "no-store",
                 },
               });
             }
@@ -55,7 +56,17 @@ export default {
           }
         }
         const assetUrl = new URL("/data/site.json", request.url);
-        return env.ASSETS.fetch(new Request(assetUrl.toString(), request));
+        const assetResp = await env.ASSETS.fetch(
+          new Request(assetUrl.toString(), request)
+        );
+        const headers = new Headers(assetResp.headers);
+        headers.set("content-type", "application/json; charset=utf-8");
+        headers.set("cache-control", "no-store, max-age=0");
+        headers.set("cdn-cache-control", "no-store");
+        return new Response(assetResp.body, {
+          status: assetResp.status,
+          headers,
+        });
       }
 
       if (request.method === "POST") {
@@ -63,7 +74,7 @@ export default {
         if (!kv) {
           return jsonErr(
             503,
-            "No KV namespace bound. In Worker → Settings → Bindings, add KV with variable name SITE_DATA (or SAVE_DATA), then redeploy."
+            "No KV namespace bound. In Worker → Settings → Bindings, add KV (binding name KV, SITE_DATA, or SAVE_DATA), then redeploy."
           );
         }
         const secret = await resolveSaveSecret(env, kv);
@@ -87,7 +98,11 @@ export default {
         await kv.put("site", body);
         return new Response(JSON.stringify({ ok: true }), {
           status: 200,
-          headers: { "content-type": "application/json; charset=utf-8" },
+          headers: {
+            "content-type": "application/json; charset=utf-8",
+            "cache-control": "no-store, max-age=0",
+            "cdn-cache-control": "no-store",
+          },
         });
       }
 
@@ -101,6 +116,10 @@ export default {
 function jsonErr(status, message) {
   return new Response(JSON.stringify({ ok: false, error: message }), {
     status,
-    headers: { "content-type": "application/json; charset=utf-8" },
+    headers: {
+      "content-type": "application/json; charset=utf-8",
+      "cache-control": "no-store, max-age=0",
+      "cdn-cache-control": "no-store",
+    },
   });
 }

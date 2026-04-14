@@ -55,7 +55,8 @@
   }
 
   function loadSiteData() {
-    return fetch("/api/site", { cache: "no-store" })
+    var bust = "_=" + Date.now();
+    return fetch("/api/site?" + bust, { cache: "no-store" })
       .then(function (r) {
         if (!r.ok) throw new Error("api");
         return r.json();
