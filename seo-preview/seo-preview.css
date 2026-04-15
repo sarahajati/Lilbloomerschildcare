@@ -1,0 +1,157 @@
+/* SEO preview area — long-form pages + review banner (not linked from live homepage yet) */
+.seo-preview-banner {
+  background: linear-gradient(135deg, #1e3d2f, #2d5a44);
+  color: #f2f8f5;
+  padding: 0.65rem 1rem;
+  text-align: center;
+  font-size: 0.9rem;
+  line-height: 1.45;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.seo-preview-banner a {
+  color: #9cf5c9;
+  font-weight: 600;
+}
+
+.seo-preview-nav {
+  background: #faf9f6;
+  border-bottom: 1px solid #e2ddd4;
+  padding: 0.85rem 1rem;
+}
+
+.seo-preview-nav__inner {
+  max-width: 72rem;
+  margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1rem;
+  font-size: 0.9rem;
+}
+
+.seo-preview-nav a {
+  color: #2d5a44;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.seo-preview-nav a:hover {
+  text-decoration: underline;
+}
+
+.seo-article {
+  max-width: 44rem;
+  margin: 0 auto;
+  padding: 2rem 1.25rem 3.5rem;
+  color: #1a221e;
+  line-height: 1.65;
+}
+
+.seo-article h1 {
+  font-family: "Fraunces", Georgia, serif;
+  font-size: clamp(1.75rem, 4vw, 2.35rem);
+  line-height: 1.15;
+  margin: 0 0 0.75rem;
+  color: #1e3d2f;
+}
+
+.seo-article .lede {
+  font-size: 1.12rem;
+  color: #4a5c54;
+  margin: 0 0 1.75rem;
+}
+
+.seo-article h2 {
+  font-family: "Fraunces", Georgia, serif;
+  font-size: 1.35rem;
+  margin: 2.25rem 0 0.75rem;
+  color: #245339;
+}
+
+.seo-article h3 {
+  font-size: 1.05rem;
+  margin: 1.5rem 0 0.5rem;
+  color: #2d4a3a;
+}
+
+.seo-article p {
+  margin: 0 0 1rem;
+}
+
+.seo-article ul {
+  margin: 0 0 1.25rem 1.1rem;
+  padding: 0;
+}
+
+.seo-article li {
+  margin-bottom: 0.35rem;
+}
+
+.seo-related {
+  margin-top: 2.5rem;
+  padding: 1.25rem 1.35rem;
+  background: #eef6f1;
+  border-radius: 12px;
+  border: 1px solid #c5dfd0;
+}
+
+.seo-related h2 {
+  margin-top: 0;
+  font-size: 1.15rem;
+}
+
+.seo-related ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.seo-related li {
+  margin-bottom: 0.5rem;
+}
+
+.seo-map-wrap {
+  margin: 2rem 0;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid #d8d2c8;
+  box-shadow: 0 8px 28px rgba(28, 42, 36, 0.08);
+}
+
+.seo-map-wrap iframe {
+  display: block;
+  width: 100%;
+  height: min(320px, 55vw);
+  border: 0;
+}
+
+.seo-faq details {
+  border: 1px solid #e2ddd4;
+  border-radius: 10px;
+  padding: 0.65rem 1rem;
+  margin-bottom: 0.5rem;
+  background: #fff;
+}
+
+.seo-faq summary {
+  font-weight: 700;
+  cursor: pointer;
+  color: #1e3d2f;
+}
+
+.seo-faq details[open] summary {
+  margin-bottom: 0.5rem;
+}
+
+.seo-footer-local {
+  margin-top: 3rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e2ddd4;
+  font-size: 0.95rem;
+  color: #4a5c54;
+}
+
+.seo-footer-local strong {
+  color: #1e3d2f;
+}
